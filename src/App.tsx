@@ -1,16 +1,391 @@
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState, type CSSProperties } from "react";
 
 import { siteCopy, type Locale, type MediaSlot, type SiteHero } from "./content";
+import claudeCodeIcon from "../../user-app/src/assets/provider-icons/claude-code.png";
+import codexIcon from "../../user-app/src/assets/provider-icons/codex.png";
+import geminiIcon from "../../user-app/src/assets/provider-icons/gemini.png";
+import kimiIcon from "../../user-app/src/assets/provider-icons/kimi.png";
+import openCodeIcon from "../../user-app/src/assets/provider-icons/opencode.png";
 
 type ThemeMode = "light" | "dark";
 
 const HERO_DEVICE_COUNT = 5;
-const HERO_ROTATE_INTERVAL_MS = 5440;
+const HERO_ROTATE_INTERVAL_MS = 4000;
 
 const STORAGE_KEYS = {
   locale: "codingns-site-locale",
   theme: "codingns-site-theme"
 } as const;
+
+type ProviderFlowItem = {
+  id: string;
+  name: string;
+  icon: string;
+  tone: string;
+  muted?: boolean;
+  variant: "card" | "chip";
+  left: string;
+  top: string;
+  rotate: string;
+  scale: string;
+};
+
+type ProviderFlowToken = {
+  id: string;
+  icon: string;
+  tone: string;
+  sourceLeft: string;
+  sourceTop: string;
+  sourceRotate: string;
+  sourceScale: string;
+  chaosLeftA: string;
+  chaosTopA: string;
+  chaosRotateA: string;
+  chaosLeftB: string;
+  chaosTopB: string;
+  chaosRotateB: string;
+  pocketLeft: string;
+  pocketTop: string;
+  queueLeft: string;
+  queueTop: string;
+  queueDrift: string;
+  exitLeft: string;
+  delay: string;
+};
+
+type ProviderQueueToken = {
+  id: string;
+  icon: string;
+  tone: string;
+  delay: string;
+};
+
+const PROVIDER_FLOW_ITEMS: ProviderFlowItem[] = [
+  {
+    id: "codex",
+    name: "Codex",
+    icon: codexIcon,
+    tone: "#2f8cff",
+    variant: "card",
+    left: "4%",
+    top: "8%",
+    rotate: "-10deg",
+    scale: "1"
+  },
+  {
+    id: "claude-code",
+    name: "Claude Code",
+    icon: claudeCodeIcon,
+    tone: "#e48a63",
+    variant: "card",
+    left: "39%",
+    top: "4%",
+    rotate: "8deg",
+    scale: "0.98"
+  },
+  {
+    id: "opencode",
+    name: "OpenCode",
+    icon: openCodeIcon,
+    tone: "#202020",
+    variant: "card",
+    left: "0%",
+    top: "40%",
+    rotate: "-7deg",
+    scale: "1.02"
+  },
+  {
+    id: "gemini",
+    name: "Gemini",
+    icon: geminiIcon,
+    tone: "#8f9dff",
+    muted: true,
+    variant: "card",
+    left: "42%",
+    top: "35%",
+    rotate: "13deg",
+    scale: "0.94"
+  },
+  {
+    id: "kimi",
+    name: "Kimi",
+    icon: kimiIcon,
+    tone: "#6d6d72",
+    muted: true,
+    variant: "chip",
+    left: "14%",
+    top: "76%",
+    rotate: "-12deg",
+    scale: "0.96"
+  },
+  {
+    id: "codex-chip",
+    name: "Codex",
+    icon: codexIcon,
+    tone: "#2f8cff",
+    variant: "chip",
+    left: "34%",
+    top: "69%",
+    rotate: "11deg",
+    scale: "0.88"
+  }
+];
+
+const PROVIDER_FLOW_TOKENS: ProviderFlowToken[] = [
+  {
+    id: "token-codex-a",
+    icon: codexIcon,
+    tone: "#2f8cff",
+    sourceLeft: "11%",
+    sourceTop: "20%",
+    sourceRotate: "-12deg",
+    sourceScale: "1.02",
+    chaosLeftA: "25%",
+    chaosTopA: "12%",
+    chaosRotateA: "10deg",
+    chaosLeftB: "39%",
+    chaosTopB: "28%",
+    chaosRotateB: "-8deg",
+    pocketLeft: "48%",
+    pocketTop: "38%",
+    queueLeft: "68%",
+    queueTop: "39%",
+    queueDrift: "6%",
+    exitLeft: "124%",
+    delay: "-0.2s"
+  },
+  {
+    id: "token-claude-a",
+    icon: claudeCodeIcon,
+    tone: "#e48a63",
+    sourceLeft: "23%",
+    sourceTop: "13%",
+    sourceRotate: "9deg",
+    sourceScale: "0.98",
+    chaosLeftA: "16%",
+    chaosTopA: "32%",
+    chaosRotateA: "-14deg",
+    chaosLeftB: "40%",
+    chaosTopB: "21%",
+    chaosRotateB: "9deg",
+    pocketLeft: "48%",
+    pocketTop: "38%",
+    queueLeft: "75%",
+    queueTop: "39%",
+    queueDrift: "6%",
+    exitLeft: "124%",
+    delay: "-1.1s"
+  },
+  {
+    id: "token-open-a",
+    icon: openCodeIcon,
+    tone: "#202020",
+    sourceLeft: "12%",
+    sourceTop: "50%",
+    sourceRotate: "-8deg",
+    sourceScale: "1.04",
+    chaosLeftA: "29%",
+    chaosTopA: "58%",
+    chaosRotateA: "13deg",
+    chaosLeftB: "43%",
+    chaosTopB: "34%",
+    chaosRotateB: "-6deg",
+    pocketLeft: "48%",
+    pocketTop: "38%",
+    queueLeft: "82%",
+    queueTop: "39%",
+    queueDrift: "6%",
+    exitLeft: "124%",
+    delay: "-2.1s"
+  },
+  {
+    id: "token-gemini-a",
+    icon: geminiIcon,
+    tone: "#8f9dff",
+    sourceLeft: "27%",
+    sourceTop: "44%",
+    sourceRotate: "13deg",
+    sourceScale: "0.94",
+    chaosLeftA: "19%",
+    chaosTopA: "26%",
+    chaosRotateA: "-12deg",
+    chaosLeftB: "42%",
+    chaosTopB: "42%",
+    chaosRotateB: "6deg",
+    pocketLeft: "48%",
+    pocketTop: "38%",
+    queueLeft: "89%",
+    queueTop: "39%",
+    queueDrift: "6%",
+    exitLeft: "124%",
+    delay: "-3.1s"
+  },
+  {
+    id: "token-kimi-a",
+    icon: kimiIcon,
+    tone: "#6d6d72",
+    sourceLeft: "18%",
+    sourceTop: "74%",
+    sourceRotate: "-11deg",
+    sourceScale: "0.96",
+    chaosLeftA: "32%",
+    chaosTopA: "68%",
+    chaosRotateA: "9deg",
+    chaosLeftB: "44%",
+    chaosTopB: "54%",
+    chaosRotateB: "-7deg",
+    pocketLeft: "48%",
+    pocketTop: "38%",
+    queueLeft: "96%",
+    queueTop: "39%",
+    queueDrift: "6%",
+    exitLeft: "124%",
+    delay: "-4.1s"
+  },
+  {
+    id: "token-codex-b",
+    icon: codexIcon,
+    tone: "#2f8cff",
+    sourceLeft: "26%",
+    sourceTop: "68%",
+    sourceRotate: "10deg",
+    sourceScale: "0.9",
+    chaosLeftA: "15%",
+    chaosTopA: "54%",
+    chaosRotateA: "-11deg",
+    chaosLeftB: "38%",
+    chaosTopB: "62%",
+    chaosRotateB: "7deg",
+    pocketLeft: "48%",
+    pocketTop: "61%",
+    queueLeft: "71%",
+    queueTop: "39%",
+    queueDrift: "6%",
+    exitLeft: "124%",
+    delay: "-0.7s"
+  },
+  {
+    id: "token-claude-b",
+    icon: claudeCodeIcon,
+    tone: "#e48a63",
+    sourceLeft: "36%",
+    sourceTop: "72%",
+    sourceRotate: "-9deg",
+    sourceScale: "0.92",
+    chaosLeftA: "27%",
+    chaosTopA: "48%",
+    chaosRotateA: "12deg",
+    chaosLeftB: "44%",
+    chaosTopB: "62%",
+    chaosRotateB: "-8deg",
+    pocketLeft: "48%",
+    pocketTop: "61%",
+    queueLeft: "78%",
+    queueTop: "39%",
+    queueDrift: "6%",
+    exitLeft: "124%",
+    delay: "-1.6s"
+  },
+  {
+    id: "token-open-b",
+    icon: openCodeIcon,
+    tone: "#202020",
+    sourceLeft: "18%",
+    sourceTop: "84%",
+    sourceRotate: "-15deg",
+    sourceScale: "0.86",
+    chaosLeftA: "31%",
+    chaosTopA: "78%",
+    chaosRotateA: "15deg",
+    chaosLeftB: "42%",
+    chaosTopB: "70%",
+    chaosRotateB: "-6deg",
+    pocketLeft: "48%",
+    pocketTop: "61%",
+    queueLeft: "85%",
+    queueTop: "39%",
+    queueDrift: "6%",
+    exitLeft: "124%",
+    delay: "-2.6s"
+  },
+  {
+    id: "token-gemini-b",
+    icon: geminiIcon,
+    tone: "#8f9dff",
+    sourceLeft: "11%",
+    sourceTop: "78%",
+    sourceRotate: "12deg",
+    sourceScale: "0.88",
+    chaosLeftA: "26%",
+    chaosTopA: "84%",
+    chaosRotateA: "-10deg",
+    chaosLeftB: "43%",
+    chaosTopB: "66%",
+    chaosRotateB: "9deg",
+    pocketLeft: "48%",
+    pocketTop: "61%",
+    queueLeft: "92%",
+    queueTop: "39%",
+    queueDrift: "6%",
+    exitLeft: "124%",
+    delay: "-3.5s"
+  },
+  {
+    id: "token-kimi-b",
+    icon: kimiIcon,
+    tone: "#6d6d72",
+    sourceLeft: "32%",
+    sourceTop: "58%",
+    sourceRotate: "7deg",
+    sourceScale: "0.9",
+    chaosLeftA: "18%",
+    chaosTopA: "70%",
+    chaosRotateA: "-13deg",
+    chaosLeftB: "45%",
+    chaosTopB: "50%",
+    chaosRotateB: "6deg",
+    pocketLeft: "48%",
+    pocketTop: "61%",
+    queueLeft: "99%",
+    queueTop: "39%",
+    queueDrift: "6%",
+    exitLeft: "124%",
+    delay: "-4.4s"
+  }
+];
+
+const PROVIDER_QUEUE_TOKENS: ProviderQueueToken[] = [
+  {
+    id: "queue-claude",
+    icon: claudeCodeIcon,
+    tone: "#e48a63",
+    delay: "0s"
+  },
+  {
+    id: "queue-open",
+    icon: openCodeIcon,
+    tone: "#202020",
+    delay: "-2.4s"
+  },
+  {
+    id: "queue-codex",
+    icon: codexIcon,
+    tone: "#2f8cff",
+    delay: "-4.8s"
+  },
+  {
+    id: "queue-gemini",
+    icon: geminiIcon,
+    tone: "#8f9dff",
+    delay: "-7.2s"
+  },
+  {
+    id: "queue-kimi",
+    icon: kimiIcon,
+    tone: "#6d6d72",
+    delay: "-9.6s"
+  }
+];
 
 function resolveDefaultLocale(): Locale {
   if (typeof window === "undefined") {
@@ -67,10 +442,48 @@ function useAssetAvailable(assetPath: string) {
   return available;
 }
 
+function useSectionActivity<T extends HTMLElement>(threshold = 0.35) {
+  const ref = useRef<T | null>(null);
+  const [active, setActive] = useState(false);
+
+  useEffect(() => {
+    const node = ref.current;
+
+    if (!node) {
+      return;
+    }
+
+    if (typeof window === "undefined" || typeof window.IntersectionObserver === "undefined") {
+      setActive(true);
+      return;
+    }
+
+    const observer = new window.IntersectionObserver(
+      ([entry]) => {
+        setActive(entry.isIntersecting && entry.intersectionRatio >= threshold);
+      },
+      {
+        threshold: [0, threshold, 0.65, 1],
+        rootMargin: "-8% 0px -8% 0px"
+      }
+    );
+
+    observer.observe(node);
+
+    return () => {
+      observer.disconnect();
+    };
+  }, [threshold]);
+
+  return [ref, active] as const;
+}
+
 export function App() {
   const [locale, setLocale] = useState<Locale>(() => resolveDefaultLocale());
   const [theme, setTheme] = useState<ThemeMode>(() => resolveDefaultTheme());
   const [frontDeviceIndex, setFrontDeviceIndex] = useState(0);
+  const [heroSectionRef, heroSectionActive] = useSectionActivity<HTMLElement>(0.42);
+  const [visualsSectionRef, visualsSectionActive] = useSectionActivity<HTMLElement>(0.28);
 
   const copy = useMemo(() => siteCopy[locale], [locale]);
   const alternateLocale = locale === "zh-CN" ? "en-US" : "zh-CN";
@@ -100,6 +513,10 @@ export function App() {
   }, [theme]);
 
   useEffect(() => {
+    if (!heroSectionActive) {
+      return;
+    }
+
     const timer = window.setInterval(() => {
       setFrontDeviceIndex((current) => (current + 1) % HERO_DEVICE_COUNT);
     }, HERO_ROTATE_INTERVAL_MS);
@@ -107,7 +524,7 @@ export function App() {
     return () => {
       window.clearInterval(timer);
     };
-  }, []);
+  }, [heroSectionActive]);
 
   return (
     <div className="page-shell">
@@ -149,7 +566,7 @@ export function App() {
       </header>
 
       <main id="top">
-        <section className="hero section" id="overview">
+        <section className="hero section" id="overview" ref={heroSectionRef}>
           <div className="hero-copy">
             <p className="eyebrow">{copy.hero.eyebrow}</p>
             <h1>{copy.hero.title}</h1>
@@ -176,19 +593,32 @@ export function App() {
             copy={copy.hero}
             frontDeviceIndex={frontDeviceIndex}
             onSelectDevice={setFrontDeviceIndex}
+            isActive={heroSectionActive}
           />
         </section>
 
-        <section className="section stacked-section" id="visuals">
+        <section className="section stacked-section" id="visuals" ref={visualsSectionRef}>
           <SectionHeading
             eyebrow={copy.visuals.sectionEyebrow}
             title={copy.visuals.title}
             description={copy.visuals.description}
           />
 
-          <div className="visual-slot-grid">
+          <ProviderFlowShowcase active={visualsSectionActive} />
+
+          <div className="visual-story-grid">
             {copy.visuals.slots.map((slot) => (
-              <MediaSlotCard key={slot.key} slot={slot} />
+              <article key={slot.key} className="visual-story-card">
+                <h3>{slot.title}</h3>
+                <p>{slot.description}</p>
+                <div className="chip-row">
+                  {slot.tags.map((tag) => (
+                    <span key={tag} className="chip">
+                      {tag}
+                    </span>
+                  ))}
+                </div>
+              </article>
             ))}
           </div>
         </section>
@@ -343,7 +773,7 @@ function LanguageSwitchIcon({ locale }: LanguageSwitchIconProps) {
 }
 
 type SectionHeadingProps = {
-  eyebrow: string;
+  eyebrow?: string;
   title: string;
   description: string;
 };
@@ -351,7 +781,7 @@ type SectionHeadingProps = {
 function SectionHeading({ eyebrow, title, description }: SectionHeadingProps) {
   return (
     <div className="section-heading">
-      <p className="eyebrow">{eyebrow}</p>
+      {eyebrow ? <p className="eyebrow">{eyebrow}</p> : null}
       <h2>{title}</h2>
       <p>{description}</p>
     </div>
@@ -368,12 +798,6 @@ function MediaSlotCard({ slot, className }: MediaSlotCardProps) {
 
   return (
     <article className={className ?? "visual-card"}>
-      <div className="device-status">
-        <span>{slot.eyebrow}</span>
-        <span>•</span>
-        <span>CODINGNS</span>
-      </div>
-
       <div className="media-frame">
         {isAssetAvailable ? (
           <img className="media-image" src={slot.assetPath} alt={slot.alt} />
@@ -406,9 +830,10 @@ type HeroFlowVisualProps = {
   copy: SiteHero;
   frontDeviceIndex: number;
   onSelectDevice: (index: number) => void;
+  isActive: boolean;
 };
 
-function HeroFlowVisual({ copy, frontDeviceIndex, onSelectDevice }: HeroFlowVisualProps) {
+function HeroFlowVisual({ copy, frontDeviceIndex, onSelectDevice, isActive }: HeroFlowVisualProps) {
   const devices = [
     {
       key: "macbook",
@@ -438,7 +863,7 @@ function HeroFlowVisual({ copy, frontDeviceIndex, onSelectDevice }: HeroFlowVisu
   ];
 
   return (
-    <div className="hero-flow" aria-label="设备切换展示区">
+    <div className="hero-flow" aria-label="设备切换展示区" data-active={isActive ? "true" : "false"}>
       <div className="device-showcase-glow device-showcase-glow-left" />
       <div className="device-showcase-glow device-showcase-glow-right" />
       <div className="device-showcase-stage">
@@ -460,6 +885,106 @@ function HeroFlowVisual({ copy, frontDeviceIndex, onSelectDevice }: HeroFlowVisu
         <strong>{copy.session.title}</strong>
       </div>
     </div>
+  );
+}
+
+type ProviderFlowShowcaseProps = {
+  active: boolean;
+};
+
+function ProviderFlowShowcase({ active }: ProviderFlowShowcaseProps) {
+  return (
+    <article className="provider-flow-panel" data-active={active ? "true" : "false"}>
+      <div className="provider-flow-stage" aria-hidden="true">
+        <div className="provider-flow-source">
+          <div className="provider-source-cloud">
+            {PROVIDER_FLOW_ITEMS.map((item) => (
+              <div
+                key={item.id}
+                className={`provider-source-fragment provider-source-fragment-${item.variant}${item.muted ? " is-muted" : ""}`}
+                style={
+                  {
+                    "--provider-tone": item.tone,
+                    "--source-item-left": item.left,
+                    "--source-item-top": item.top,
+                    "--source-item-rotate": item.rotate,
+                    "--source-item-scale": item.scale,
+                  } as CSSProperties
+                }
+              >
+                <span className="provider-source-fragment-icon">
+                  <img src={item.icon} alt="" loading="lazy" decoding="async" />
+                </span>
+                {item.variant === "card" ? <strong>{item.name}</strong> : null}
+              </div>
+            ))}
+          </div>
+        </div>
+
+        <div className="provider-flow-pocket">
+          <div className="provider-flow-pocket-mark">
+            <span>CodingNS</span>
+          </div>
+          <div className="provider-flow-pocket-mouth" />
+          <div className="provider-flow-pocket-glow" />
+        </div>
+
+        <div className="provider-flow-rail">
+          <div className="provider-flow-rail-track" />
+          <div className="provider-flow-rail-track provider-flow-rail-track-lower" />
+        </div>
+
+        {PROVIDER_QUEUE_TOKENS.map((item) => (
+          <div
+            key={item.id}
+            className="provider-flow-queue-token"
+            style={
+              {
+                "--provider-tone": item.tone,
+                "--queue-delay": item.delay,
+              } as CSSProperties
+            }
+          >
+            <span className="provider-flow-token-icon">
+              <img src={item.icon} alt="" loading="lazy" decoding="async" />
+            </span>
+          </div>
+        ))}
+
+        {PROVIDER_FLOW_TOKENS.map((item) => (
+          <div
+            key={item.id}
+            className="provider-flow-token"
+            style={
+              {
+                "--provider-tone": item.tone,
+                "--source-left": item.sourceLeft,
+                "--source-top": item.sourceTop,
+                "--source-rotate": item.sourceRotate,
+                "--source-scale": item.sourceScale,
+                "--chaos-left-a": item.chaosLeftA,
+                "--chaos-top-a": item.chaosTopA,
+                "--chaos-rotate-a": item.chaosRotateA,
+                "--chaos-left-b": item.chaosLeftB,
+                "--chaos-top-b": item.chaosTopB,
+                "--chaos-rotate-b": item.chaosRotateB,
+                "--pocket-left": item.pocketLeft,
+                "--pocket-top": item.pocketTop,
+                "--queue-left": item.queueLeft,
+                "--queue-top": item.queueTop,
+                "--queue-drift": item.queueDrift,
+                "--exit-left": item.exitLeft,
+                "--token-delay": item.delay,
+              } as CSSProperties
+            }
+          >
+            <span className="provider-flow-token-icon">
+              <img src={item.icon} alt="" loading="lazy" decoding="async" />
+            </span>
+          </div>
+        ))}
+      </div>
+    </article>
   );
 }
 
