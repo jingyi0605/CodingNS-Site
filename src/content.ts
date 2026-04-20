@@ -387,92 +387,92 @@ export const siteCopy: Record<Locale, SiteCopy> = {
       }
     },
     visuals: {
-      sectionEyebrow: "产品画面",
-      title: "先看产品，再看介绍。",
-      description: "下面这些位置留给真实截图。页面会自动替换，不需要再改代码。",
+      sectionEyebrow: "",
+      title: "用同样的方式操作不同厂商的CLI",
+      description: "CodingNS 负责把多种 CLI 供应商收进一个统一入口里。",
       slots: [
         {
           key: "desktop-shot",
           eyebrow: "Desktop",
-          title: "桌面端截图",
-          description: "建议放最完整的一张工作区画面。",
+          title: "保留原有习惯",
+          description: "继续用熟悉的 CLI，不需要先为官网文案学一套新说法。",
           assetPath: "/site-images/hero-desktop.png",
           alt: "CodingNS 桌面端截图",
-          tags: ["宽图", "工作区", "主画面"],
-          placeholderLabel: "桌面端画面"
+          tags: ["CLI", "统一入口", "继续使用"],
+          placeholderLabel: "CLI 兼容画面"
         },
         {
           key: "mobile-shot",
           eyebrow: "Mobile",
-          title: "移动端截图",
-          description: "建议放对话续接或任务查看画面。",
+          title: "统一查看入口",
+          description: "不同来源的会话，放到同一个地方查看、续接和切换。",
           assetPath: "/site-images/hero-mobile.png",
           alt: "CodingNS 移动端截图",
-          tags: ["竖图", "继续对话", "任务接力"],
-          placeholderLabel: "移动端画面"
+          tags: ["多 CLI", "同一入口", "统一查看"],
+          placeholderLabel: "统一入口画面"
         },
         {
           key: "web-shot",
           eyebrow: "Web",
-          title: "网页端截图",
-          description: "建议放跨设备继续工作的画面。",
+          title: "兼容能力继续扩展",
+          description: "先把常用 CLI 收进来，再把更多选择接进同一条体验里。",
           assetPath: "/site-images/hero-web.png",
           alt: "CodingNS 网页端截图",
-          tags: ["浏览器", "跨设备", "继续工作"],
-          placeholderLabel: "网页端画面"
+          tags: ["扩展支持", "兼容能力", "持续补齐"],
+          placeholderLabel: "兼容能力画面"
         }
       ]
     },
     highlights: {
-      sectionEyebrow: "重点",
-      title: "真正需要先讲清楚的，只有三件事。",
-      description: "不用写成长广告。把重点说清，用户自然会继续往下看。",
+      sectionEyebrow: "工作区",
+      title: "一段会话，不只是聊天记录。",
+      description: "文件、终端、Git 和上下文都会一起跟上。",
       items: [
-        { title: "会话连续", description: "同一段工作在不同设备之间自然接续。" },
-        { title: "AI 接力", description: "正在进行的任务不会因为离开桌面就停住。" },
-        { title: "更少切换", description: "文件、对话和状态尽量留在同一条线上。" }
+        { title: "文件就在旁边", description: "看到会话的同时，也能看到项目文件和当前改动。" },
+        { title: "终端继续在跑", description: "命令、输出和最近进展，不需要再切去别的地方找。" },
+        { title: "Git 不脱节", description: "查看差异、理解改动、继续推进，都还留在同一段工作里。" }
       ]
     },
     platforms: {
-      sectionEyebrow: "平台",
-      title: "三个入口，一套状态。",
-      description: "该完整时完整，该轻一点时轻一点，但看到的还是同一段工作。",
+      sectionEyebrow: "设备",
+      title: "从桌面到手机，从网页到平板。",
+      description: "你离开的不是工作，只是当前这块屏幕。",
       cards: [
-        { name: "桌面端", summary: "适合完整工作区和长时间操作。", tags: ["多窗口", "文件", "终端"] },
-        { name: "移动端", summary: "适合看进度、回一句话、接住任务。", tags: ["iPhone", "Android", "继续对话"] },
-        { name: "网页端", summary: "适合临时打开、快速进入、马上继续。", tags: ["浏览器", "跨设备", "即开即用"] }
+        { name: "桌面端", summary: "完整工作区留在大屏上，适合长时间推进同一段任务。", tags: ["多窗口", "文件", "终端"] },
+        { name: "移动端", summary: "离开桌面时，手机负责接住进度、摘要和下一条回复。", tags: ["iPhone", "Android", "继续回复"] },
+        { name: "网页端 / 平板", summary: "临时打开也能继续，不需要先把背景再解释一遍。", tags: ["浏览器", "平板", "继续工作"] }
       ]
     },
     providers: {
-      sectionEyebrow: "兼容",
-      title: "把常用 CLI 放进同一套体验里。",
-      description: "不是让你换工具，是让你少一次切换。",
+      sectionEyebrow: "分叉",
+      title: "一个方向不够，就从任意节点分出新的会话。",
+      description: "继续试，而不是重新来。",
       cards: [
-        { name: "Codex", summary: "继续现有工作方式。" },
-        { name: "Claude Code", summary: "把进行中的任务带到更多屏幕。" },
-        { name: "OpenCode", summary: "把不同来源的会话收拢到一起。" },
-        { name: "更多 CLI", summary: "兼容能力继续扩展。" }
+        { name: "从消息继续", summary: "不必复制整段上下文，直接从当前节点开始下一种尝试。" },
+        { name: "保留原来链路", summary: "原来的推进过程还在，新方向只是分出去，不是覆盖掉。" },
+        { name: "并排比较", summary: "不同思路可以同时保留，回头判断时更清楚。" },
+        { name: "继续向前试", summary: "试错不是重开一局，而是在现有基础上继续推。" }
       ],
       media: {
         key: "providers-shot",
-        eyebrow: "Compatibility",
-        title: "CLI 兼容画面",
-        description: "建议放统一会话视图或多 CLI 兼容相关截图。",
+        eyebrow: "Branching",
+        title: "会话分叉画面",
+        description: "建议放从消息节点分出新会话或分支树相关截图。",
         assetPath: "/site-images/providers.png",
-        alt: "CodingNS CLI 兼容截图",
-        tags: ["横图", "兼容", "统一视图"],
-        placeholderLabel: "CLI 兼容画面"
+        alt: "CodingNS 会话分叉截图",
+        tags: ["横图", "分叉", "继续试"],
+        placeholderLabel: "会话分叉画面"
       }
     },
     cta: {
-      eyebrow: "继续往下做",
-      title: "把真实截图放进来，这个首页就完整了。",
-      description: "结构已经够了。下一步别再补空话，直接补图。",
+      eyebrow: "远程",
+      title: "不管项目在本机、远程主机还是云端环境。",
+      description: "CodingNS 都让进入、查看和继续推进更统一。",
       primaryAction: "回到顶部",
       secondaryAction: "查看产品画面"
     },
     footer: {
-      summary: "让你的 CLI 会话出现在每一块屏幕上。",
+      summary: "把 CLI、工作区和不同屏幕收进同一条体验里。",
       copyright: "© 2026 CodingNS"
     }
   },
@@ -677,92 +677,92 @@ export const siteCopy: Record<Locale, SiteCopy> = {
       }
     },
     visuals: {
-      sectionEyebrow: "Product visuals",
-      title: "Show the product before the copy.",
-      description: "These slots are reserved for real screenshots. The page replaces them automatically when the files are added.",
+      sectionEyebrow: "",
+      title: "Use different CLI vendors in the same familiar way.",
+      description: "CodingNS brings multiple CLI providers into one unified entry.",
       slots: [
         {
           key: "desktop-shot",
           eyebrow: "Desktop",
-          title: "Desktop screenshot",
-          description: "Use the strongest full-workspace image here.",
+          title: "Keep familiar habits",
+          description: "Stay with the CLI tools you already use instead of learning a new front door first.",
           assetPath: "/site-images/hero-desktop.png",
           alt: "CodingNS desktop screenshot",
-          tags: ["Wide", "Workspace", "Primary"],
-          placeholderLabel: "Desktop view"
+          tags: ["CLI", "Unified entry", "Keep using"],
+          placeholderLabel: "CLI compatibility view"
         },
         {
           key: "mobile-shot",
           eyebrow: "Mobile",
-          title: "Mobile screenshot",
-          description: "Good for continued chat or task handoff.",
+          title: "One place to view",
+          description: "Sessions from different sources can still be viewed, continued, and switched in one place.",
           assetPath: "/site-images/hero-mobile.png",
           alt: "CodingNS mobile screenshot",
-          tags: ["Tall", "Chat", "Handoff"],
-          placeholderLabel: "Mobile view"
+          tags: ["Multi-CLI", "One entry", "Unified view"],
+          placeholderLabel: "Unified entry view"
         },
         {
           key: "web-shot",
           eyebrow: "Web",
-          title: "Web screenshot",
-          description: "Show cross-device continuation here.",
+          title: "Compatibility keeps expanding",
+          description: "Bring in the common CLI tools first, then keep extending the same experience to more of them.",
           assetPath: "/site-images/hero-web.png",
           alt: "CodingNS web screenshot",
-          tags: ["Browser", "Cross-device", "Continue"],
-          placeholderLabel: "Web view"
+          tags: ["More support", "Compatibility", "Expanding"],
+          placeholderLabel: "Compatibility view"
         }
       ]
     },
     highlights: {
-      sectionEyebrow: "Focus",
-      title: "Only three things need to land fast.",
-      description: "No long ad copy. State the point and let the visuals carry the rest.",
+      sectionEyebrow: "Workspace",
+      title: "A session is more than a chat log.",
+      description: "Files, terminal, Git, and context all move with it.",
       items: [
-        { title: "Session continuity", description: "The same work moves naturally between devices." },
-        { title: "AI relay", description: "Ongoing tasks keep moving when you step away." },
-        { title: "Less switching", description: "Files, chat, and status stay on one line." }
+        { title: "Files stay beside it", description: "See the conversation and the project files together, without splitting the work apart." },
+        { title: "The terminal keeps running", description: "Commands, output, and recent progress stay close instead of being pushed into another tool." },
+        { title: "Git stays in the loop", description: "Review changes, understand diffs, and keep moving without dropping the session context." }
       ]
     },
     platforms: {
-      sectionEyebrow: "Platforms",
-      title: "Three entrances. One state.",
-      description: "Full when it needs to be full, lighter when it should be light, but still the same work.",
+      sectionEyebrow: "Devices",
+      title: "From desktop to phone, from browser to tablet.",
+      description: "What you leave behind is the screen, not the work.",
       cards: [
-        { name: "Desktop", summary: "Built for the full workspace and longer sessions.", tags: ["Multi-window", "Files", "Terminal"] },
-        { name: "Mobile", summary: "Built for checking progress and picking up work fast.", tags: ["iPhone", "Android", "Continue chat"] },
-        { name: "Web", summary: "Built for quick access and immediate continuation.", tags: ["Browser", "Cross-device", "Instant"] }
+        { name: "Desktop", summary: "Keep the full workspace on the larger screen when the work needs depth and time.", tags: ["Multi-window", "Files", "Terminal"] },
+        { name: "Mobile", summary: "Leave the desk and use the phone to catch up on progress, summaries, and the next reply.", tags: ["iPhone", "Android", "Reply fast"] },
+        { name: "Web / Tablet", summary: "Open it temporarily and still continue without retelling the background first.", tags: ["Browser", "Tablet", "Continue work"] }
       ]
     },
     providers: {
-      sectionEyebrow: "Compatibility",
-      title: "Bring familiar CLI tools into one experience.",
-      description: "It is not about replacing your tools. It is about removing one more switch.",
+      sectionEyebrow: "Branching",
+      title: "When one direction is not enough, branch from any point.",
+      description: "Keep trying instead of starting over.",
       cards: [
-        { name: "Codex", summary: "Keep the current workflow." },
-        { name: "Claude Code", summary: "Carry active work to more screens." },
-        { name: "OpenCode", summary: "Bring different session sources together." },
-        { name: "More CLI", summary: "Compatibility keeps expanding." }
+        { name: "Continue from any message", summary: "Start the next attempt from the current node instead of rebuilding the whole context." },
+        { name: "Keep the original path", summary: "The existing line of work stays intact while the new direction branches away from it." },
+        { name: "Compare side by side", summary: "Multiple ideas can stay alive at once, which makes the next decision clearer." },
+        { name: "Push the work forward", summary: "Experimentation becomes a continuation of the work, not a reset." }
       ],
       media: {
         key: "providers-shot",
-        eyebrow: "Compatibility",
-        title: "CLI compatibility visual",
-        description: "Use a unified session view or multi-CLI compatibility screen.",
+        eyebrow: "Branching",
+        title: "Session branching visual",
+        description: "Use a screenshot that shows branching from a message or a visible branch tree.",
         assetPath: "/site-images/providers.png",
-        alt: "CodingNS CLI compatibility screenshot",
-        tags: ["Landscape", "Compatibility", "Unified view"],
-        placeholderLabel: "CLI compatibility view"
+        alt: "CodingNS session branching screenshot",
+        tags: ["Landscape", "Branching", "Try next"],
+        placeholderLabel: "Session branching view"
       }
     },
     cta: {
-      eyebrow: "Next step",
-      title: "Once the real screenshots are in, the page is ready.",
-      description: "The structure is enough. Do not add more filler copy. Add the product visuals.",
+      eyebrow: "Remote",
+      title: "Whether the project lives locally, on a remote host, or in the cloud.",
+      description: "CodingNS keeps entering, viewing, and continuing the work more consistent.",
       primaryAction: "Back to top",
       secondaryAction: "See product visuals"
     },
     footer: {
-      summary: "Put your CLI session on every screen.",
+      summary: "Bring CLI, workspace, and every screen into one continuous flow.",
       copyright: "© 2026 CodingNS"
     }
   }
