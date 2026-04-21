@@ -153,7 +153,11 @@ export type SiteHero = {
   subtitle: string;
   description: string;
   primaryAction: string;
+  primaryActionHref: string;
+  primaryActionExternal?: boolean;
   secondaryAction: string;
+  secondaryActionHref: string;
+  secondaryActionExternal?: boolean;
   notes: string[];
   devices: {
     macbook: DeviceLabel;
@@ -212,6 +216,8 @@ type SiteCopy = {
     title: string;
     description: string;
     cards: ProviderCard[];
+    detailAction: string;
+    detailActionHref: string;
     visual: RemoteAccessVisualCopy;
   };
   moreFeatures: {
@@ -258,8 +264,11 @@ export const siteCopy: Record<Locale, SiteCopy> = {
       title: "你的 CLI 会话，出现在每一块屏幕上",
       subtitle: "从任意设备开始，到任意设备上继续。",
       description: "同一段工作，在不同设备上自然接续。",
-      primaryAction: "查看产品画面",
-      secondaryAction: "查看会话分叉",
+      primaryAction: "查看核心能力",
+      primaryActionHref: "#visuals",
+      secondaryAction: "开始使用",
+      secondaryActionHref: "https://github.com/jingyi0605/CodingNS/releases",
+      secondaryActionExternal: true,
       notes: ["多端连续", "AI 接力", "CLI 兼容"],
       devices: {
         macbook: { name: "MacBook", caption: "完整工作区" },
@@ -567,6 +576,8 @@ export const siteCopy: Record<Locale, SiteCopy> = {
           summary: "电脑、手机、浏览器都能进。"
         }
       ],
+      detailAction: "查看详情",
+      detailActionHref: "https://channel.codingns.com:111.62.241.102:10247",
       visual: {
         devicesTitle: "外部设备",
         relayTitle: "官方中继",
@@ -668,8 +679,11 @@ export const siteCopy: Record<Locale, SiteCopy> = {
       title: "Your CLI session, on every screen.",
       subtitle: "Start on any device. Continue on any other screen.",
       description: "The same work carries across devices without breaking.",
-      primaryAction: "See product visuals",
-      secondaryAction: "See session branching",
+      primaryAction: "See core capabilities",
+      primaryActionHref: "#visuals",
+      secondaryAction: "Get started",
+      secondaryActionHref: "https://github.com/jingyi0605/CodingNS/releases",
+      secondaryActionExternal: true,
       notes: ["Cross-device", "AI relay", "CLI support"],
       devices: {
         macbook: { name: "MacBook", caption: "Full workspace" },
@@ -977,6 +991,8 @@ export const siteCopy: Record<Locale, SiteCopy> = {
           summary: "Laptop, phone, and browser all get in."
         }
       ],
+      detailAction: "View details",
+      detailActionHref: "https://channel.codingns.com:111.62.241.102:10247",
       visual: {
         devicesTitle: "External Devices",
         relayTitle: "Official Relay",

@@ -2371,8 +2371,8 @@ button {
   background: rgba(17, 19, 26, 0.18);
 }
 
-.showcase-slot-0 .workspace-thread-track,
-.showcase-slot-0 .mobile-message-track {
+.hero-flow[data-active="true"] .showcase-slot-0 .workspace-thread-track,
+.hero-flow[data-active="true"] .showcase-slot-0 .mobile-message-track {
   animation-play-state: running;
 }
 
@@ -2394,6 +2394,7 @@ button {
   color: #fff;
   box-shadow: 0 24px 50px rgba(26, 43, 78, 0.28);
   animation: session-card-float 6.8s ease-in-out infinite;
+  animation-play-state: paused;
 }
 
 .flow-session-card span {
@@ -3300,6 +3301,17 @@ button {
   margin-top: 30px;
 }
 
+.providers-copy-remote {
+  display: flex;
+  flex-direction: column;
+  min-height: 100%;
+}
+
+.remote-access-copy-actions {
+  margin-top: auto;
+  padding-top: 24px;
+}
+
 .more-feature-grid {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
@@ -3517,6 +3529,7 @@ button {
   stroke-dasharray: 10 18;
   filter: url(#remote-topology-glow);
   animation: remote-path-flow 8.8s linear infinite;
+  animation-play-state: paused;
 }
 
 .remote-topology-path-host {
@@ -3535,6 +3548,10 @@ button {
 
 .remote-access-stage[data-active="true"] .remote-topology-packet {
   opacity: 1;
+}
+
+.remote-access-stage[data-active="true"] .remote-topology-path {
+  animation-play-state: running;
 }
 
 .remote-topology-packet circle:first-child {
@@ -3829,10 +3846,8 @@ button {
   border-radius: 22px;
 }
 
-.hero-flow[data-active="false"] .flow-session-card,
-.hero-flow[data-active="false"] .workspace-thread-track,
-.hero-flow[data-active="false"] .mobile-message-track {
-  animation-play-state: paused !important;
+.hero-flow[data-active="true"] .flow-session-card {
+  animation-play-state: running;
 }
 
 .cta-card {

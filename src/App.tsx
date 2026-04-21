@@ -450,9 +450,33 @@ function useAssetAvailable(assetPath: string) {
   return available;
 }
 
-function useSectionActivity<T extends HTMLElement>(threshold = 0.35) {
+function usePageVisibility() {
+  const [pageVisible, setPageVisible] = useState(() =>
+    typeof document === "undefined" ? true : !document.hidden
+  );
+
+  useEffect(() => {
+    if (typeof document === "undefined") {
+      return;
+    }
+
+    const handleVisibilityChange = () => {
+      setPageVisible(!document.hidden);
+    };
+
+    document.addEventListener("visibilitychange", handleVisibilityChange);
+
+    return () => {
+      document.removeEventListener("visibilitychange", handleVisibilityChange);
+    };
+  }, []);
+
+  return pageVisible;
+}
+
+function useSectionActivity<T extends HTMLElement>(threshold = 0.35, pageVisible = true) {
   const ref = useRef<T | null>(null);
-  const [active, setActive] = useState(false);
+  const [intersecting, setIntersecting] = useState(false);
 
   useEffect(() => {
     const node = ref.current;
@@ -462,13 +486,13 @@ function useSectionActivity<T extends HTMLElement>(threshold = 0.35) {
     }
 
     if (typeof window === "undefined" || typeof window.IntersectionObserver === "undefined") {
-      setActive(true);
+      setIntersecting(true);
       return;
     }
 
     const observer = new window.IntersectionObserver(
       ([entry]) => {
-        setActive(entry.isIntersecting && entry.intersectionRatio >= threshold);
+        setIntersecting(entry.isIntersecting && entry.intersectionRatio >= threshold);
       },
       {
         threshold: [0, threshold, 0.65, 1],
@@ -483,7 +507,7 @@ function useSectionActivity<T extends HTMLElement>(threshold = 0.35) {
     };
   }, [threshold]);
 
-  return [ref, active] as const;
+  return [ref, intersecting && pageVisible] as const;
 }
 
 export function App() {
@@ -491,9 +515,11 @@ export function App() {
   const [theme, setTheme] = useState<ThemeMode>(() => resolveDefaultTheme());
   const [frontDeviceIndex, setFrontDeviceIndex] = useState(0);
   const [platformMediaIndex, setPlatformMediaIndex] = useState(0);
-  const [heroSectionRef, heroSectionActive] = useSectionActivity<HTMLElement>(0.42);
-  const [visualsSectionRef, visualsSectionActive] = useSectionActivity<HTMLElement>(0.28);
-  const [remoteAccessSectionRef, remoteAccessSectionActive] = useSectionActivity<HTMLElement>(0.26);
+  const pageVisible = usePageVisibility();
+  const [heroSectionRef, heroSectionActive] = useSectionActivity<HTMLElement>(0.42, pageVisible);
+  const [visualsSectionRef, visualsSectionActive] = useSectionActivity<HTMLElement>(0.28, pageVisible);
+  const [platformsSectionRef, platformsSectionActive] = useSectionActivity<HTMLElement>(0.22, pageVisible);
+  const [remoteAccessSectionRef, remoteAccessSectionActive] = useSectionActivity<HTMLElement>(0.26, pageVisible);
 
   const copy = useMemo(() => siteCopy[locale], [locale]);
   const alternateLocale = locale === "zh-CN" ? "en-US" : "zh-CN";
@@ -548,6 +574,10 @@ export function App() {
       return;
     }
 
+    if (!platformsSectionActive) {
+      return;
+    }
+
     const timer = window.setInterval(() => {
       setPlatformMediaIndex((current) => (current + 1) % copy.platforms.media.length);
     }, PLATFORM_ROTATE_INTERVAL_MS);
@@ -555,7 +585,7 @@ export function App() {
     return () => {
       window.clearInterval(timer);
     };
-  }, [copy.platforms.media.length]);
+  }, [copy.platforms.media.length, platformsSectionActive]);
 
   return (
     <div className="page-shell">
@@ -621,10 +651,20 @@ export function App() {
             <p className="hero-description">{copy.hero.description}</p>
 
             <div className="hero-actions">
-              <a className="primary-link" href="#visuals">
+              <a
+                className="primary-link"
+                href={copy.hero.primaryActionHref}
+                target={copy.hero.primaryActionExternal ? "_blank" : undefined}
+                rel={copy.hero.primaryActionExternal ? "noreferrer" : undefined}
+              >
                 {copy.hero.primaryAction}
               </a>
-              <a className="secondary-link" href="#providers">
+              <a
+                className="secondary-link"
+                href={copy.hero.secondaryActionHref}
+                target={copy.hero.secondaryActionExternal ? "_blank" : undefined}
+                rel={copy.hero.secondaryActionExternal ? "noreferrer" : undefined}
+              >
                 {copy.hero.secondaryAction}
               </a>
             </div>
@@ -679,7 +719,7 @@ export function App() {
           <WorkspaceHighlightShowcase highlight={copy.highlights} />
         </section>
 
-        <section className="section stacked-section" id="platforms">
+        <section className="section stacked-section" id="platforms" ref={platformsSectionRef}>
           <SectionHeading
             eyebrow={copy.platforms.sectionEyebrow}
             title={copy.platforms.title}
@@ -785,7 +825,7 @@ export function App() {
           <div className="providers-layout providers-layout-remote">
             <RemoteAccessShowcase visual={copy.remoteAccess.visual} active={remoteAccessSectionActive} />
 
-            <div className="providers-copy">
+            <div className="providers-copy providers-copy-remote">
               <SectionHeading
                 eyebrow={copy.remoteAccess.sectionEyebrow}
                 title={copy.remoteAccess.title}
@@ -799,6 +839,17 @@ export function App() {
                     <p>{card.summary}</p>
                   </article>
                 ))}
+              </div>
+
+              <div className="remote-access-copy-actions">
+                <a
+                  className="secondary-link"
+                  href={copy.remoteAccess.detailActionHref}
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  {copy.remoteAccess.detailAction}
+                </a>
               </div>
             </div>
           </div>
@@ -1282,6 +1333,40 @@ type RemoteAccessShowcaseProps = {
 };
 
 function RemoteAccessShowcase({ visual, active }: RemoteAccessShowcaseProps) {
+  const ingressPackets = active
+    ? ["remote-path-laptop", "remote-path-mobile", "remote-path-browser"].flatMap((pathId, groupIndex) =>
+        Array.from({ length: 4 }, (_, packetIndex) => (
+          <g
+            key={`${pathId}-${packetIndex}`}
+            className="remote-topology-packet remote-topology-packet-ingress"
+            style={{ ["--packet-delay" as string]: `${-(groupIndex * 0.45 + packetIndex * 1.05)}s` } as CSSProperties}
+          >
+            <circle cx="0" cy="0" r="4.5" />
+            <circle cx="0" cy="0" r="10" className="remote-topology-packet-glow" />
+            <animateMotion dur="4.2s" begin={`-${groupIndex * 0.45 + packetIndex * 1.05}s`} repeatCount="indefinite">
+              <mpath href={`#${pathId}`} />
+            </animateMotion>
+          </g>
+        ))
+      )
+    : null;
+
+  const hostPackets = active
+    ? Array.from({ length: 7 }, (_, packetIndex) => (
+        <g
+          key={`remote-host-packet-${packetIndex}`}
+          className="remote-topology-packet remote-topology-packet-host"
+          style={{ ["--packet-delay" as string]: `${-(packetIndex * 0.68)}s` } as CSSProperties}
+        >
+          <circle cx="0" cy="0" r="4.5" />
+          <circle cx="0" cy="0" r="10" className="remote-topology-packet-glow" />
+          <animateMotion dur="3.4s" begin={`-${packetIndex * 0.68}s`} repeatCount="indefinite">
+            <mpath href="#remote-path-host" />
+          </animateMotion>
+        </g>
+      ))
+    : null;
+
   return (
     <article className="provider-showcase remote-access-showcase">
       <div className="remote-access-stage" data-active={active ? "true" : "false"}>
@@ -1305,36 +1390,8 @@ function RemoteAccessShowcase({ visual, active }: RemoteAccessShowcaseProps) {
           <path id="remote-path-mobile" className="remote-topology-path" d="M 185 278 C 318 278, 384 276, 470 278" />
           <path id="remote-path-browser" className="remote-topology-path" d="M 185 392 C 312 410, 380 360, 470 306" />
           <path id="remote-path-host" className="remote-topology-path remote-topology-path-host" d="M 566 278 C 684 278, 742 278, 828 278" />
-
-          {["remote-path-laptop", "remote-path-mobile", "remote-path-browser"].flatMap((pathId, groupIndex) =>
-            Array.from({ length: 4 }, (_, packetIndex) => (
-              <g
-                key={`${pathId}-${packetIndex}`}
-                className="remote-topology-packet remote-topology-packet-ingress"
-                style={{ ["--packet-delay" as string]: `${-(groupIndex * 0.45 + packetIndex * 1.05)}s` } as CSSProperties}
-              >
-                <circle cx="0" cy="0" r="4.5" />
-                <circle cx="0" cy="0" r="10" className="remote-topology-packet-glow" />
-                <animateMotion dur="4.2s" begin={`-${groupIndex * 0.45 + packetIndex * 1.05}s`} repeatCount="indefinite">
-                  <mpath href={`#${pathId}`} />
-                </animateMotion>
-              </g>
-            ))
-          )}
-
-          {Array.from({ length: 7 }, (_, packetIndex) => (
-            <g
-              key={`remote-host-packet-${packetIndex}`}
-              className="remote-topology-packet remote-topology-packet-host"
-              style={{ ["--packet-delay" as string]: `${-(packetIndex * 0.68)}s` } as CSSProperties}
-            >
-              <circle cx="0" cy="0" r="4.5" />
-              <circle cx="0" cy="0" r="10" className="remote-topology-packet-glow" />
-              <animateMotion dur="3.4s" begin={`-${packetIndex * 0.68}s`} repeatCount="indefinite">
-                <mpath href="#remote-path-host" />
-              </animateMotion>
-            </g>
-          ))}
+          {ingressPackets}
+          {hostPackets}
         </svg>
 
         <div className="remote-access-label remote-access-label-clients">{visual.devicesTitle}</div>
