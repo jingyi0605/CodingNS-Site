@@ -8,11 +8,11 @@ import {
   type MediaSlot,
   type SiteHero
 } from "./content";
-import claudeCodeIcon from "../../user-app/src/assets/provider-icons/claude-code.png";
-import codexIcon from "../../user-app/src/assets/provider-icons/codex.png";
-import geminiIcon from "../../user-app/src/assets/provider-icons/gemini.png";
-import kimiIcon from "../../user-app/src/assets/provider-icons/kimi.png";
-import openCodeIcon from "../../user-app/src/assets/provider-icons/opencode.png";
+import claudeCodeIcon from "./assets/provider-icons/claude-code.png";
+import codexIcon from "./assets/provider-icons/codex.png";
+import geminiIcon from "./assets/provider-icons/gemini.png";
+import kimiIcon from "./assets/provider-icons/kimi.png";
+import openCodeIcon from "./assets/provider-icons/opencode.png";
 
 type ThemeMode = "light" | "dark";
 

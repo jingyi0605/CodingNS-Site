@@ -451,7 +451,7 @@ export const siteCopy: Record<Locale, SiteCopy> = {
           eyebrow: "Desktop",
           title: "保留原有习惯",
           description: "继续用熟悉的 CLI，不需要先为官网文案学一套新说法。",
-          assetPath: "/site-images/hero-desktop.png",
+          assetPath: "/site-images/workspace-files.png",
           alt: "CodingNS 桌面端截图",
           tags: ["CLI", "统一入口", "继续使用"],
           placeholderLabel: "CLI 兼容画面"
@@ -461,7 +461,7 @@ export const siteCopy: Record<Locale, SiteCopy> = {
           eyebrow: "Mobile",
           title: "统一查看入口",
           description: "不同来源的会话，放到同一个地方查看、续接和切换。",
-          assetPath: "/site-images/hero-mobile.png",
+          assetPath: "/site-images/capabilities-automation.png",
           alt: "CodingNS 移动端截图",
           tags: ["多 CLI", "同一入口", "统一查看"],
           placeholderLabel: "统一入口画面"
@@ -471,7 +471,7 @@ export const siteCopy: Record<Locale, SiteCopy> = {
           eyebrow: "Web",
           title: "兼容能力继续扩展",
           description: "先把常用 CLI 收进来，再把更多选择接进同一条体验里。",
-          assetPath: "/site-images/hero-web.png",
+          assetPath: "/site-images/providers-branching-2.png",
           alt: "CodingNS 网页端截图",
           tags: ["扩展支持", "兼容能力", "持续补齐"],
           placeholderLabel: "兼容能力画面"
@@ -866,7 +866,7 @@ export const siteCopy: Record<Locale, SiteCopy> = {
           eyebrow: "Desktop",
           title: "Keep familiar habits",
           description: "Stay with the CLI tools you already use instead of learning a new front door first.",
-          assetPath: "/site-images/hero-desktop.png",
+          assetPath: "/site-images/workspace-files.png",
           alt: "CodingNS desktop screenshot",
           tags: ["CLI", "Unified entry", "Keep using"],
           placeholderLabel: "CLI compatibility view"
@@ -876,7 +876,7 @@ export const siteCopy: Record<Locale, SiteCopy> = {
           eyebrow: "Mobile",
           title: "One place to view",
           description: "Sessions from different sources can still be viewed, continued, and switched in one place.",
-          assetPath: "/site-images/hero-mobile.png",
+          assetPath: "/site-images/capabilities-automation.png",
           alt: "CodingNS mobile screenshot",
           tags: ["Multi-CLI", "One entry", "Unified view"],
           placeholderLabel: "Unified entry view"
@@ -886,7 +886,7 @@ export const siteCopy: Record<Locale, SiteCopy> = {
           eyebrow: "Web",
           title: "Compatibility keeps expanding",
           description: "Bring in the common CLI tools first, then keep extending the same experience to more of them.",
-          assetPath: "/site-images/hero-web.png",
+          assetPath: "/site-images/providers-branching-2.png",
           alt: "CodingNS web screenshot",
           tags: ["More support", "Compatibility", "Expanding"],
           placeholderLabel: "Compatibility view"
