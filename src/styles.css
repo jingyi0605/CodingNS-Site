@@ -2576,13 +2576,13 @@ button {
   left: 22px;
   top: 50%;
   z-index: 2;
-  width: min(32%, 350px);
+  width: min(38%, 420px);
   transform: translateY(-50%);
 }
 
 .provider-source-cloud {
   position: relative;
-  min-height: 268px;
+  min-height: 308px;
 }
 
 .provider-source-fragment {
@@ -2625,8 +2625,8 @@ button {
 }
 
 .provider-source-fragment-chip {
-  width: 64px;
-  height: 64px;
+  width: 74px;
+  height: 74px;
   border: 1px solid rgba(183, 193, 213, 0.44);
   border-radius: 22px;
   background: rgba(255, 255, 255, 0.72);
@@ -2672,8 +2672,8 @@ button {
 }
 
 .provider-source-fragment-chip .provider-source-fragment-icon {
-  width: 40px;
-  height: 40px;
+  width: 46px;
+  height: 46px;
 }
 
 .provider-source-fragment-icon img,
@@ -2820,7 +2820,6 @@ button {
   animation-delay: var(--token-delay);
   animation-play-state: paused;
   opacity: 0;
-  will-change: left, top, transform, opacity;
 }
 
 .provider-flow-queue-token {
@@ -2837,7 +2836,6 @@ button {
   animation-delay: var(--queue-delay);
   animation-play-state: paused;
   opacity: 1;
-  will-change: left, opacity;
 }
 
 .provider-flow-token-icon {
@@ -2869,53 +2867,63 @@ button {
 }
 
 .provider-flow-panel[data-active="true"] .provider-source-fragment {
-  animation:
-    provider-source-jitter 2.8s steps(1, end) infinite,
-    provider-source-presence var(--source-presence-duration, 12s) steps(1, end) infinite;
+  animation: provider-source-jitter 2.8s steps(1, end) infinite;
   animation-play-state: running;
-  animation-delay: var(--source-jitter-delay, 0s), var(--source-presence-delay, 0s);
+  animation-delay: var(--source-jitter-delay, 0s);
 }
 
 .provider-source-fragment:nth-child(1) {
   --source-jitter-delay: -0.4s;
-  --source-presence-delay: 0s;
-  --source-presence-duration: 12s;
 }
 
 .provider-source-fragment:nth-child(2) {
   --source-jitter-delay: -1.2s;
-  --source-presence-delay: -2s;
-  --source-presence-duration: 12s;
 }
 
 .provider-source-fragment:nth-child(3) {
   --source-jitter-delay: -2.6s;
-  --source-presence-delay: -4s;
-  --source-presence-duration: 12s;
 }
 
 .provider-source-fragment:nth-child(4) {
   --source-jitter-delay: -0.9s;
-  --source-presence-delay: -6s;
-  --source-presence-duration: 12s;
 }
 
 .provider-source-fragment:nth-child(5) {
   --source-jitter-delay: -1.9s;
-  --source-presence-delay: -8s;
-  --source-presence-duration: 12s;
 }
 
 .provider-source-fragment:nth-child(6) {
   --source-jitter-delay: -3.1s;
-  --source-presence-delay: -10s;
-  --source-presence-duration: 12s;
+}
+
+.provider-source-fragment:nth-child(7) {
+  --source-jitter-delay: -1.5s;
+}
+
+.provider-source-fragment:nth-child(8) {
+  --source-jitter-delay: -2.2s;
+}
+
+.provider-source-fragment:nth-child(9) {
+  --source-jitter-delay: -0.7s;
+}
+
+.provider-source-fragment:nth-child(10) {
+  --source-jitter-delay: -2.9s;
 }
 
 .provider-flow-panel[data-active="true"] .provider-flow-token,
 .provider-flow-panel[data-active="true"] .provider-flow-queue-token,
 .provider-flow-panel[data-active="true"] .provider-flow-pocket-glow {
   animation-play-state: running;
+}
+
+.provider-flow-panel[data-active="true"] .provider-flow-token {
+  will-change: left, top, transform, opacity;
+}
+
+.provider-flow-panel[data-active="true"] .provider-flow-queue-token {
+  will-change: left, opacity;
 }
 
 .visual-placeholder {

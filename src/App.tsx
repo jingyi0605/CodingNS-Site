@@ -70,61 +70,70 @@ type ProviderQueueToken = {
 
 const PROVIDER_FLOW_ITEMS: ProviderFlowItem[] = [
   {
-    id: "codex",
-    name: "Codex",
-    icon: codexIcon,
-    tone: "#2f8cff",
-    variant: "card",
-    left: "4%",
-    top: "8%",
-    rotate: "-10deg",
-    scale: "1"
-  },
-  {
-    id: "claude-code",
-    name: "Claude Code",
-    icon: claudeCodeIcon,
-    tone: "#e48a63",
-    variant: "card",
-    left: "39%",
-    top: "4%",
-    rotate: "8deg",
-    scale: "0.98"
-  },
-  {
-    id: "opencode",
+    id: "opencode-card",
     name: "OpenCode",
     icon: openCodeIcon,
     tone: "#202020",
     variant: "card",
     left: "0%",
-    top: "40%",
-    rotate: "-7deg",
-    scale: "1.02"
+    top: "24%",
+    rotate: "-8deg",
+    scale: "0.96"
   },
   {
-    id: "gemini",
+    id: "gemini-card",
     name: "Gemini",
     icon: geminiIcon,
     tone: "#8f9dff",
-    muted: true,
     variant: "card",
-    left: "42%",
-    top: "35%",
-    rotate: "13deg",
-    scale: "0.94"
+    left: "32%",
+    top: "18%",
+    rotate: "8deg",
+    scale: "0.92"
   },
   {
-    id: "kimi",
+    id: "claude-card",
+    name: "Claude Code",
+    icon: claudeCodeIcon,
+    tone: "#e48a63",
+    variant: "card",
+    left: "22%",
+    top: "48%",
+    rotate: "9deg",
+    scale: "0.9"
+  },
+  {
+    id: "codex-card",
+    name: "Codex",
+    icon: codexIcon,
+    tone: "#2f8cff",
+    variant: "card",
+    left: "45%",
+    top: "52%",
+    rotate: "-7deg",
+    scale: "0.88"
+  },
+  {
+    id: "kimi-card",
     name: "Kimi",
     icon: kimiIcon,
     tone: "#6d6d72",
-    muted: true,
+    variant: "card",
+    left: "6%",
+    top: "70%",
+    rotate: "-10deg",
+    scale: "0.84"
+  },
+  {
+    id: "claude-chip",
+    name: "Claude Code",
+    icon: claudeCodeIcon,
+    tone: "#e48a63",
     variant: "chip",
     left: "14%",
-    top: "76%",
-    rotate: "-12deg",
-    scale: "0.96"
+    top: "8%",
+    rotate: "-6deg",
+    scale: "1"
   },
   {
     id: "codex-chip",
@@ -132,10 +141,43 @@ const PROVIDER_FLOW_ITEMS: ProviderFlowItem[] = [
     icon: codexIcon,
     tone: "#2f8cff",
     variant: "chip",
-    left: "34%",
-    top: "69%",
-    rotate: "11deg",
-    scale: "0.88"
+    left: "54%",
+    top: "12%",
+    rotate: "6deg",
+    scale: "0.98"
+  },
+  {
+    id: "gemini-chip",
+    name: "Gemini",
+    icon: geminiIcon,
+    tone: "#8f9dff",
+    variant: "chip",
+    left: "60%",
+    top: "34%",
+    rotate: "-8deg",
+    scale: "0.94"
+  },
+  {
+    id: "opencode-chip",
+    name: "OpenCode",
+    icon: openCodeIcon,
+    tone: "#202020",
+    variant: "chip",
+    left: "58%",
+    top: "74%",
+    rotate: "7deg",
+    scale: "0.96"
+  },
+  {
+    id: "kimi-chip",
+    name: "Kimi",
+    icon: kimiIcon,
+    tone: "#6d6d72",
+    variant: "chip",
+    left: "30%",
+    top: "82%",
+    rotate: "-10deg",
+    scale: "0.92"
   }
 ];
 
