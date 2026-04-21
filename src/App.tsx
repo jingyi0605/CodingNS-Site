@@ -1,6 +1,13 @@
 import { useEffect, useMemo, useRef, useState, type CSSProperties } from "react";
 
-import { siteCopy, type Locale, type MediaSlot, type SiteHero } from "./content";
+import {
+  siteCopy,
+  type FeatureIconName,
+  type HighlightSection,
+  type Locale,
+  type MediaSlot,
+  type SiteHero
+} from "./content";
 import claudeCodeIcon from "../../user-app/src/assets/provider-icons/claude-code.png";
 import codexIcon from "../../user-app/src/assets/provider-icons/codex.png";
 import geminiIcon from "../../user-app/src/assets/provider-icons/gemini.png";
@@ -11,6 +18,7 @@ type ThemeMode = "light" | "dark";
 
 const HERO_DEVICE_COUNT = 5;
 const HERO_ROTATE_INTERVAL_MS = 4000;
+const PLATFORM_ROTATE_INTERVAL_MS = 3600;
 
 const STORAGE_KEYS = {
   locale: "codingns-site-locale",
@@ -482,11 +490,16 @@ export function App() {
   const [locale, setLocale] = useState<Locale>(() => resolveDefaultLocale());
   const [theme, setTheme] = useState<ThemeMode>(() => resolveDefaultTheme());
   const [frontDeviceIndex, setFrontDeviceIndex] = useState(0);
+  const [platformMediaIndex, setPlatformMediaIndex] = useState(0);
   const [heroSectionRef, heroSectionActive] = useSectionActivity<HTMLElement>(0.42);
   const [visualsSectionRef, visualsSectionActive] = useSectionActivity<HTMLElement>(0.28);
+  const [remoteAccessSectionRef, remoteAccessSectionActive] = useSectionActivity<HTMLElement>(0.26);
 
   const copy = useMemo(() => siteCopy[locale], [locale]);
   const alternateLocale = locale === "zh-CN" ? "en-US" : "zh-CN";
+  const currentPlatformMedia = copy.platforms.media[platformMediaIndex] ?? copy.platforms.media[0];
+  const platformsImageAvailable = useAssetAvailable(currentPlatformMedia.assetPath);
+  const providersImageAvailable = useAssetAvailable(copy.providers.media.assetPath);
 
   useEffect(() => {
     document.documentElement.dataset.theme = theme;
@@ -526,6 +539,24 @@ export function App() {
     };
   }, [heroSectionActive]);
 
+  useEffect(() => {
+    setPlatformMediaIndex(0);
+  }, [locale]);
+
+  useEffect(() => {
+    if (copy.platforms.media.length < 2) {
+      return;
+    }
+
+    const timer = window.setInterval(() => {
+      setPlatformMediaIndex((current) => (current + 1) % copy.platforms.media.length);
+    }, PLATFORM_ROTATE_INTERVAL_MS);
+
+    return () => {
+      window.clearInterval(timer);
+    };
+  }, [copy.platforms.media.length]);
+
   return (
     <div className="page-shell">
       <header className="topbar">
@@ -536,13 +567,29 @@ export function App() {
 
         <nav className="topnav" aria-label={copy.nav.brand}>
           {copy.nav.items.map((item) => (
-            <a key={item.href} href={item.href}>
+            <a
+              key={item.href}
+              href={item.href}
+              target={item.external ? "_blank" : undefined}
+              rel={item.external ? "noreferrer" : undefined}
+            >
               {item.label}
             </a>
           ))}
         </nav>
 
         <div className="topbar-controls">
+          <a
+            className="icon-switch-button icon-link-button"
+            href={copy.nav.githubHref}
+            target="_blank"
+            rel="noreferrer"
+            aria-label="GitHub"
+            title="GitHub"
+          >
+            <GitHubIcon />
+          </a>
+
           <button
             type="button"
             className="icon-switch-button"
@@ -629,15 +676,7 @@ export function App() {
             title={copy.highlights.title}
             description={copy.highlights.description}
           />
-
-          <div className="highlight-list">
-            {copy.highlights.items.map((item) => (
-              <article key={item.title} className="highlight-item">
-                <h3>{item.title}</h3>
-                <p>{item.description}</p>
-              </article>
-            ))}
-          </div>
+          <WorkspaceHighlightShowcase highlight={copy.highlights} />
         </section>
 
         <section className="section stacked-section" id="platforms">
@@ -647,21 +686,56 @@ export function App() {
             description={copy.platforms.description}
           />
 
-          <div className="platform-grid">
-            {copy.platforms.cards.map((card) => (
-              <article key={card.name} className="platform-card">
-                <div className="platform-icon">{card.name.slice(0, 1)}</div>
-                <h3>{card.name}</h3>
-                <p className="platform-description">{card.summary}</p>
-                <div className="chip-row">
-                  {card.tags.map((tag) => (
-                    <span key={tag} className="chip">
-                      {tag}
-                    </span>
-                  ))}
+          <div className="platforms-showcase">
+            <article className="platforms-media">
+              <div className="platforms-media-stage">
+                <div className="media-frame">
+                  {platformsImageAvailable ? (
+                    <img
+                      key={currentPlatformMedia.assetPath}
+                      className="media-image feature-rotating-image"
+                      src={currentPlatformMedia.assetPath}
+                      alt={currentPlatformMedia.alt}
+                    />
+                  ) : (
+                    <div className="visual-placeholder" aria-label={currentPlatformMedia.alt}>
+                      <div className="visual-placeholder-screen" />
+                      <div className="visual-placeholder-copy">
+                        <span>{currentPlatformMedia.placeholderLabel}</span>
+                      </div>
+                    </div>
+                  )}
                 </div>
-              </article>
-            ))}
+              </div>
+
+              <div className="feature-media-switcher" aria-label={locale === "zh-CN" ? "图片切换器" : "Image switcher"}>
+                {copy.platforms.media.map((item, index) => (
+                  <button
+                    key={item.assetPath}
+                    type="button"
+                    className={`feature-switcher-dot${index === platformMediaIndex ? " is-active" : ""}`}
+                    onClick={() => setPlatformMediaIndex(index)}
+                    aria-label={
+                      locale === "zh-CN"
+                        ? `切换到第 ${index + 1} 张图片`
+                        : `Switch to image ${index + 1}`
+                    }
+                    aria-pressed={index === platformMediaIndex}
+                  >
+                    <span />
+                  </button>
+                ))}
+              </div>
+            </article>
+
+            <div className="platforms-points" aria-label={copy.platforms.sectionEyebrow}>
+              {copy.platforms.points.map((point, index) => (
+                <article key={point} className="platform-point">
+                  <span className="platform-point-index">{index + 1}</span>
+                  <p>{point}</p>
+                </article>
+              ))}
+            </div>
           </div>
         </section>
 
@@ -684,33 +758,87 @@ export function App() {
               </div>
             </div>
 
-            <MediaSlotCard slot={copy.providers.media} className="provider-showcase" />
+            <article className="provider-showcase">
+              <div className="provider-media-stage">
+                <div className="media-frame">
+                  {providersImageAvailable ? (
+                    <img
+                      className="media-image"
+                      src={copy.providers.media.assetPath}
+                      alt={copy.providers.media.alt}
+                    />
+                  ) : (
+                    <div className="visual-placeholder" aria-label={copy.providers.media.alt}>
+                      <div className="visual-placeholder-screen" />
+                      <div className="visual-placeholder-copy">
+                        <span>{copy.providers.media.placeholderLabel}</span>
+                      </div>
+                    </div>
+                  )}
+                </div>
+              </div>
+            </article>
           </div>
         </section>
 
-        <section className="section cta-section">
-          <div className="cta-card">
+        <section className="section stacked-section" id="remote-access" ref={remoteAccessSectionRef}>
+          <div className="providers-layout providers-layout-remote">
+            <RemoteAccessShowcase visual={copy.remoteAccess.visual} active={remoteAccessSectionActive} />
+
+            <div className="providers-copy">
+              <SectionHeading
+                eyebrow={copy.remoteAccess.sectionEyebrow}
+                title={copy.remoteAccess.title}
+                description={copy.remoteAccess.description}
+              />
+
+              <div className="provider-grid">
+                {copy.remoteAccess.cards.map((card) => (
+                  <article key={card.name} className="provider-card">
+                    <div className="provider-name">{card.name}</div>
+                    <p>{card.summary}</p>
+                  </article>
+                ))}
+              </div>
+            </div>
+          </div>
+        </section>
+
+        <section className="section cta-section" id="more-features">
+          <div className="stacked-section">
             <SectionHeading
-              eyebrow={copy.cta.eyebrow}
-              title={copy.cta.title}
-              description={copy.cta.description}
+              eyebrow={copy.moreFeatures.sectionEyebrow}
+              title={copy.moreFeatures.title}
+              description={copy.moreFeatures.description}
             />
 
-            <div className="hero-actions">
-              <a className="primary-link" href="#top">
-                {copy.cta.primaryAction}
-              </a>
-              <a className="secondary-link" href="#visuals">
-                {copy.cta.secondaryAction}
-              </a>
+            <div className="more-feature-grid">
+              {copy.moreFeatures.cards.map((card) => (
+                <article key={card.name} className="more-feature-card">
+                  <div className="more-feature-icon" aria-hidden="true">
+                    <FeatureIcon icon={card.icon} />
+                  </div>
+                  <h3>{card.name}</h3>
+                  <p>{card.summary}</p>
+                </article>
+              ))}
             </div>
           </div>
         </section>
       </main>
 
       <footer className="footer">
-        <p>{copy.footer.summary}</p>
-        <span>{copy.footer.copyright}</span>
+        <div className="footer-main">
+          <p>{copy.footer.summary}</p>
+          <span>{copy.footer.copyright}</span>
+        </div>
+        <div className="footer-contact" id="contact">
+          <strong>{copy.footer.contactTitle}</strong>
+          <div className="footer-contact-row">
+            <span>{copy.footer.contactLabel}</span>
+            <b>{copy.footer.contactValue}</b>
+          </div>
+        </div>
       </footer>
     </div>
   );
@@ -745,6 +873,120 @@ function ThemeSwitchIcon({ theme }: ThemeSwitchIconProps) {
         stroke="currentColor"
         strokeWidth="1.8"
         strokeLinecap="round"
+      />
+    </svg>
+  );
+}
+
+type FeatureIconProps = {
+  icon: FeatureIconName;
+};
+
+function FeatureIcon({ icon }: FeatureIconProps) {
+  return (
+    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="1.8" strokeLinecap="round" strokeLinejoin="round">
+      {renderFeatureIconGlyph(icon)}
+    </svg>
+  );
+}
+
+function renderFeatureIconGlyph(icon: FeatureIconName) {
+  switch (icon) {
+    case "quick-phrase":
+      return (
+        <>
+          <path d="M5 7.5a2.5 2.5 0 0 1 2.5-2.5h9A2.5 2.5 0 0 1 19 7.5v6A2.5 2.5 0 0 1 16.5 16H11l-3.5 3v-3H7.5A2.5 2.5 0 0 1 5 13.5Z" />
+          <path d="M9 9.5h6" />
+          <path d="M9 12.5h4" />
+        </>
+      );
+    case "file-preview":
+      return (
+        <>
+          <path d="M8 4.5h6l4 4v10A1.5 1.5 0 0 1 16.5 20h-9A1.5 1.5 0 0 1 6 18.5v-12A2 2 0 0 1 8 4.5Z" />
+          <path d="M14 4.5v4h4" />
+          <path d="M9 13c1.1-1.3 2.2-2 3.3-2 1.1 0 2.1.7 3.2 2" />
+          <path d="M9 16h6" />
+        </>
+      );
+    case "debug-launch":
+      return (
+        <>
+          <path d="M12 4v4" />
+          <path d="M8.5 6.5h7" />
+          <path d="M9 12.5 14.5 16 9 19.5Z" />
+          <path d="M5.5 20h13" />
+        </>
+      );
+    case "skill-sync":
+      return (
+        <>
+          <path d="M9 5.5 6.5 8 9 10.5 11.5 8Z" />
+          <path d="M15 5.5 12.5 8 15 10.5 17.5 8Z" />
+          <path d="M9 13.5 6.5 16 9 18.5 11.5 16Z" />
+          <path d="M15 13.5 12.5 16 15 18.5 17.5 16Z" />
+          <path d="M11.5 8h1" />
+          <path d="M11.5 16h1" />
+          <path d="M9 10.5v3" />
+          <path d="M15 10.5v3" />
+        </>
+      );
+    case "config-switch":
+      return (
+        <>
+          <path d="M6 8h11" />
+          <path d="m14 5 3 3-3 3" />
+          <path d="M18 16H7" />
+          <path d="m10 13-3 3 3 3" />
+        </>
+      );
+    case "device-management":
+      return (
+        <>
+          <rect x="5" y="6" width="8" height="11" rx="1.8" />
+          <path d="M17 10.5h2" />
+          <path d="M18 9.5v2" />
+          <circle cx="9" cy="14.5" r="0.8" fill="currentColor" stroke="none" />
+          <path d="M7.5 19h3" />
+        </>
+      );
+    case "git-history":
+      return (
+        <>
+          <path d="M8.5 6.5a2.5 2.5 0 1 0 0 5 2.5 2.5 0 0 0 0-5Z" />
+          <path d="M15.5 12.5a2.5 2.5 0 1 0 0 5 2.5 2.5 0 0 0 0-5Z" />
+          <path d="M8.5 11.5v3A3.5 3.5 0 0 0 12 18h1" />
+          <path d="M12 7h4.5" />
+        </>
+      );
+    case "host-switch":
+      return (
+        <>
+          <rect x="4.5" y="5.5" width="8" height="6" rx="1.4" />
+          <rect x="11.5" y="12.5" width="8" height="6" rx="1.4" />
+          <path d="M8.5 14h6" />
+          <path d="m12.5 11 2 3-2 3" />
+        </>
+      );
+    case "remote-access":
+      return (
+        <>
+          <path d="M8 16c1.1 1 2.5 1.5 4 1.5 3.3 0 6-2.5 6-5.5s-2.7-5.5-6-5.5c-2.6 0-4.8 1.5-5.7 3.8" />
+          <path d="M4.5 18.5 10 13" />
+          <path d="M4.5 13v5.5H10" />
+        </>
+      );
+    default:
+      return null;
+  }
+}
+
+function GitHubIcon() {
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      <path
+        d="M12 3.8a8.7 8.7 0 0 0-2.75 16.95c.44.08.6-.19.6-.43v-1.5c-2.43.53-2.95-1.03-2.95-1.03-.4-1.01-.97-1.28-.97-1.28-.8-.54.06-.53.06-.53.88.06 1.34.91 1.34.91.78 1.34 2.05.95 2.55.72.08-.57.3-.95.55-1.17-1.94-.22-3.98-.97-3.98-4.34 0-.96.34-1.74.9-2.35-.09-.22-.39-1.11.08-2.31 0 0 .74-.24 2.41.9A8.3 8.3 0 0 1 12 7.96c.74 0 1.49.1 2.19.3 1.67-1.14 2.4-.9 2.4-.9.48 1.2.18 2.09.09 2.31.56.61.9 1.39.9 2.35 0 3.38-2.04 4.12-3.99 4.34.31.27.59.79.59 1.6v2.36c0 .24.16.52.61.43A8.7 8.7 0 0 0 12 3.8Z"
+        fill="currentColor"
       />
     </svg>
   );
@@ -821,6 +1063,41 @@ function MediaSlotCard({ slot, className }: MediaSlotCardProps) {
             </span>
           ))}
         </div>
+      </div>
+    </article>
+  );
+}
+
+type WorkspaceHighlightShowcaseProps = {
+  highlight: HighlightSection;
+};
+
+function WorkspaceHighlightShowcase({ highlight }: WorkspaceHighlightShowcaseProps) {
+  const stageCards = [highlight.cards[1], highlight.cards[0], highlight.cards[2]].filter(Boolean);
+
+  return (
+    <article className="workspace-showcase-panel">
+      <div className="workspace-showcase-copy">
+        <h3>{highlight.spotlight.title}</h3>
+        <p>{highlight.spotlight.description}</p>
+        <div className="chip-row">
+          {highlight.spotlight.tags.map((tag) => (
+            <span key={tag} className="chip">
+              {tag}
+            </span>
+          ))}
+        </div>
+      </div>
+
+      <div className="workspace-showcase-stage" aria-hidden="true">
+        {stageCards.map((card) => (
+          <article key={card.key} className={`workspace-stage-card workspace-stage-card-${card.key}`}>
+            <span className="workspace-stage-card-label">{card.eyebrow}</span>
+            <div className="workspace-stage-card-frame">
+              <img src={card.assetPath} alt={card.alt} loading="lazy" decoding="async" />
+            </div>
+          </article>
+        ))}
       </div>
     </article>
   );
@@ -985,6 +1262,153 @@ function ProviderFlowShowcase({ active }: ProviderFlowShowcaseProps) {
         ))}
       </div>
     </article>
+  );
+}
+
+type RemoteAccessShowcaseProps = {
+  visual: {
+    devicesTitle: string;
+    relayTitle: string;
+    relaySubtitle: string;
+    hostTitle: string;
+    accessNote: string;
+    deviceLabels: {
+      laptop: string;
+      mobile: string;
+      browser: string;
+    };
+  };
+  active: boolean;
+};
+
+function RemoteAccessShowcase({ visual, active }: RemoteAccessShowcaseProps) {
+  return (
+    <article className="provider-showcase remote-access-showcase">
+      <div className="remote-access-stage" data-active={active ? "true" : "false"}>
+        <svg className="remote-access-topology" viewBox="0 0 1000 560" aria-hidden="true">
+          <defs>
+            <linearGradient id="remote-topology-line" x1="0%" y1="0%" x2="100%" y2="0%">
+              <stop offset="0%" stopColor="rgba(82, 145, 255, 0.08)" />
+              <stop offset="48%" stopColor="rgba(82, 145, 255, 0.8)" />
+              <stop offset="100%" stopColor="rgba(84, 220, 183, 0.12)" />
+            </linearGradient>
+            <filter id="remote-topology-glow" x="-120%" y="-120%" width="340%" height="340%">
+              <feGaussianBlur stdDeviation="6" result="blur" />
+              <feMerge>
+                <feMergeNode in="blur" />
+                <feMergeNode in="SourceGraphic" />
+              </feMerge>
+            </filter>
+          </defs>
+
+          <path id="remote-path-laptop" className="remote-topology-path" d="M 185 165 C 310 150, 378 175, 470 235" />
+          <path id="remote-path-mobile" className="remote-topology-path" d="M 185 278 C 318 278, 384 276, 470 278" />
+          <path id="remote-path-browser" className="remote-topology-path" d="M 185 392 C 312 410, 380 360, 470 306" />
+          <path id="remote-path-host" className="remote-topology-path remote-topology-path-host" d="M 566 278 C 684 278, 742 278, 828 278" />
+
+          {["remote-path-laptop", "remote-path-mobile", "remote-path-browser"].flatMap((pathId, groupIndex) =>
+            Array.from({ length: 4 }, (_, packetIndex) => (
+              <g
+                key={`${pathId}-${packetIndex}`}
+                className="remote-topology-packet remote-topology-packet-ingress"
+                style={{ ["--packet-delay" as string]: `${-(groupIndex * 0.45 + packetIndex * 1.05)}s` } as CSSProperties}
+              >
+                <circle cx="0" cy="0" r="4.5" />
+                <circle cx="0" cy="0" r="10" className="remote-topology-packet-glow" />
+                <animateMotion dur="4.2s" begin={`-${groupIndex * 0.45 + packetIndex * 1.05}s`} repeatCount="indefinite">
+                  <mpath href={`#${pathId}`} />
+                </animateMotion>
+              </g>
+            ))
+          )}
+
+          {Array.from({ length: 7 }, (_, packetIndex) => (
+            <g
+              key={`remote-host-packet-${packetIndex}`}
+              className="remote-topology-packet remote-topology-packet-host"
+              style={{ ["--packet-delay" as string]: `${-(packetIndex * 0.68)}s` } as CSSProperties}
+            >
+              <circle cx="0" cy="0" r="4.5" />
+              <circle cx="0" cy="0" r="10" className="remote-topology-packet-glow" />
+              <animateMotion dur="3.4s" begin={`-${packetIndex * 0.68}s`} repeatCount="indefinite">
+                <mpath href="#remote-path-host" />
+              </animateMotion>
+            </g>
+          ))}
+        </svg>
+
+        <div className="remote-access-label remote-access-label-clients">{visual.devicesTitle}</div>
+        <div className="remote-access-label remote-access-label-relay">{visual.relayTitle}</div>
+        <div className="remote-access-label remote-access-label-host">{visual.hostTitle}</div>
+
+        <div className="remote-access-node remote-access-node-client remote-access-node-laptop">
+          <span className="remote-access-node-orb">
+            <DeviceGlyph type="laptop" />
+          </span>
+          <strong>{visual.deviceLabels.laptop}</strong>
+        </div>
+        <div className="remote-access-node remote-access-node-client remote-access-node-mobile">
+          <span className="remote-access-node-orb">
+            <DeviceGlyph type="mobile" />
+          </span>
+          <strong>{visual.deviceLabels.mobile}</strong>
+        </div>
+        <div className="remote-access-node remote-access-node-client remote-access-node-browser">
+          <span className="remote-access-node-orb">
+            <DeviceGlyph type="browser" />
+          </span>
+          <strong>{visual.deviceLabels.browser}</strong>
+        </div>
+
+        <div className="remote-access-node remote-access-node-relay">
+          <span className="remote-access-node-core remote-access-node-core-relay">Relay</span>
+          <strong>{visual.relayTitle}</strong>
+          <span>{visual.relaySubtitle}</span>
+        </div>
+
+        <div className="remote-access-node remote-access-node-host">
+          <span className="remote-access-node-core remote-access-node-core-host">CNS</span>
+          <strong>Host</strong>
+        </div>
+
+        <div className="remote-access-note">
+          <span>{visual.accessNote}</span>
+        </div>
+      </div>
+    </article>
+  );
+}
+
+type DeviceGlyphProps = {
+  type: "laptop" | "mobile" | "browser";
+};
+
+function DeviceGlyph({ type }: DeviceGlyphProps) {
+  if (type === "laptop") {
+    return (
+      <svg viewBox="0 0 24 24" aria-hidden="true">
+        <rect x="5" y="6" width="14" height="9" rx="1.8" fill="none" stroke="currentColor" strokeWidth="1.7" />
+        <path d="M3.5 17.5h17" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" />
+      </svg>
+    );
+  }
+
+  if (type === "mobile") {
+    return (
+      <svg viewBox="0 0 24 24" aria-hidden="true">
+        <rect x="8" y="4.5" width="8" height="15" rx="2" fill="none" stroke="currentColor" strokeWidth="1.7" />
+        <circle cx="12" cy="16.5" r="0.9" fill="currentColor" />
+      </svg>
+    );
+  }
+
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      <rect x="4.5" y="5.5" width="15" height="11" rx="2" fill="none" stroke="currentColor" strokeWidth="1.7" />
+      <path d="M8.5 19h7" fill="none" stroke="currentColor" strokeWidth="1.7" strokeLinecap="round" />
+      <path d="M7.5 9h9" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" />
+      <path d="M7.5 12h5" fill="none" stroke="currentColor" strokeWidth="1.4" strokeLinecap="round" />
+    </svg>
   );
 }
 

@@ -3,6 +3,7 @@ export type Locale = "zh-CN" | "en-US";
 type NavigationItem = {
   label: string;
   href: string;
+  external?: boolean;
 };
 
 export type MediaSlot = {
@@ -16,20 +17,57 @@ export type MediaSlot = {
   placeholderLabel: string;
 };
 
-type HighlightItem = {
+export type HighlightSection = {
+  sectionEyebrow: string;
   title: string;
   description: string;
+  spotlight: {
+    title: string;
+    description: string;
+    tags: string[];
+  };
+  cards: MediaSlot[];
 };
 
-type PlatformCard = {
-  name: string;
-  summary: string;
-  tags: string[];
+type CapabilityMedia = {
+  assetPath: string;
+  alt: string;
+  placeholderLabel: string;
 };
 
 type ProviderCard = {
   name: string;
   summary: string;
+};
+
+type RemoteAccessVisualCopy = {
+  devicesTitle: string;
+  relayTitle: string;
+  relaySubtitle: string;
+  hostTitle: string;
+  accessNote: string;
+  deviceLabels: {
+    laptop: string;
+    mobile: string;
+    browser: string;
+  };
+};
+
+export type FeatureIconName =
+  | "quick-phrase"
+  | "file-preview"
+  | "debug-launch"
+  | "skill-sync"
+  | "config-switch"
+  | "device-management"
+  | "git-history"
+  | "host-switch"
+  | "remote-access";
+
+type FeatureCard = {
+  name: string;
+  summary: string;
+  icon: FeatureIconName;
 };
 
 type DeviceLabel = {
@@ -140,6 +178,7 @@ type SiteCopy = {
     brand: string;
     brandMark: string;
     items: NavigationItem[];
+    githubHref: string;
     themeLabel: string;
     lightMode: string;
     darkMode: string;
@@ -153,35 +192,40 @@ type SiteCopy = {
     description: string;
     slots: MediaSlot[];
   };
-  highlights: {
-    sectionEyebrow: string;
-    title: string;
-    description: string;
-    items: HighlightItem[];
-  };
+  highlights: HighlightSection;
   platforms: {
     sectionEyebrow: string;
     title: string;
     description: string;
-    cards: PlatformCard[];
+    media: CapabilityMedia[];
+    points: string[];
   };
   providers: {
     sectionEyebrow: string;
     title: string;
     description: string;
     cards: ProviderCard[];
-    media: MediaSlot;
+    media: CapabilityMedia;
   };
-  cta: {
-    eyebrow: string;
+  remoteAccess: {
+    sectionEyebrow: string;
     title: string;
     description: string;
-    primaryAction: string;
-    secondaryAction: string;
+    cards: ProviderCard[];
+    visual: RemoteAccessVisualCopy;
+  };
+  moreFeatures: {
+    sectionEyebrow: string;
+    title: string;
+    description: string;
+    cards: FeatureCard[];
   };
   footer: {
     summary: string;
     copyright: string;
+    contactTitle: string;
+    contactLabel: string;
+    contactValue: string;
   };
 };
 
@@ -194,10 +238,12 @@ export const siteCopy: Record<Locale, SiteCopy> = {
       brandMark: "CNS",
       items: [
         { label: "概览", href: "#overview" },
-        { label: "画面", href: "#visuals" },
-        { label: "平台", href: "#platforms" },
-        { label: "兼容", href: "#providers" }
+        { label: "核心能力", href: "#visuals" },
+        { label: "更多功能", href: "#more-features" },
+        { label: "用户交流", href: "#contact" },
+        { label: "文档", href: "https://docs.codingns.com", external: true }
       ],
+      githubHref: "https://github.com/jingyi0605/CodingNS",
       themeLabel: "显示模式",
       lightMode: "日间",
       darkMode: "夜间",
@@ -213,7 +259,7 @@ export const siteCopy: Record<Locale, SiteCopy> = {
       subtitle: "从任意设备开始，到任意设备上继续。",
       description: "同一段工作，在不同设备上自然接续。",
       primaryAction: "查看产品画面",
-      secondaryAction: "查看兼容能力",
+      secondaryAction: "查看会话分叉",
       notes: ["多端连续", "AI 接力", "CLI 兼容"],
       devices: {
         macbook: { name: "MacBook", caption: "完整工作区" },
@@ -427,53 +473,171 @@ export const siteCopy: Record<Locale, SiteCopy> = {
       sectionEyebrow: "工作区",
       title: "一段会话，不只是聊天记录。",
       description: "文件、终端、Git 和上下文都会一起跟上。",
-      items: [
-        { title: "文件就在旁边", description: "看到会话的同时，也能看到项目文件和当前改动。" },
-        { title: "终端继续在跑", description: "命令、输出和最近进展，不需要再切去别的地方找。" },
-        { title: "Git 不脱节", description: "查看差异、理解改动、继续推进，都还留在同一段工作里。" }
+      spotlight: {
+        title: "在一个闭环工作区里，同时接住文件、Git 和终端。",
+        description: "不是在三个工具之间来回找，而是在同一块工作区里切换视角、确认状态、继续推进。",
+        tags: ["文件树", "Git 变更", "进程状态"]
+      },
+      cards: [
+        {
+          key: "workspace-files",
+          eyebrow: "Files",
+          title: "文件管理留在工作区里",
+          description: "目录、文件和当前会话共用同一个入口，看到什么、改到哪里，都不需要再跳出去确认。",
+          assetPath: "/site-images/workspace-files.png",
+          alt: "CodingNS 文件管理截图",
+          tags: ["文件树", "工作区", "同屏查看"],
+          placeholderLabel: "文件管理截图"
+        },
+        {
+          key: "workspace-git",
+          eyebrow: "Git",
+          title: "Git 变化直接接在当前任务上",
+          description: "查看改动、写提交信息、继续回到会话推进，整个链路保持在同一段上下文里。",
+          assetPath: "/site-images/workspace-git.png",
+          alt: "CodingNS Git 管理截图",
+          tags: ["差异查看", "提交", "闭环推进"],
+          placeholderLabel: "Git 管理截图"
+        },
+        {
+          key: "workspace-process",
+          eyebrow: "Process",
+          title: "终端和启动项也在这一层收口",
+          description: "服务是否启动、端口是否占用、要不要新开终端，都能在工作区里直接判断和处理。",
+          assetPath: "/site-images/workspace-process.png",
+          alt: "CodingNS 进程管理截图",
+          tags: ["启动项", "端口", "终端状态"],
+          placeholderLabel: "进程管理截图"
+        }
       ]
     },
     platforms: {
-      sectionEyebrow: "设备",
-      title: "从桌面到手机，从网页到平板。",
-      description: "你离开的不是工作，只是当前这块屏幕。",
-      cards: [
-        { name: "桌面端", summary: "完整工作区留在大屏上，适合长时间推进同一段任务。", tags: ["多窗口", "文件", "终端"] },
-        { name: "移动端", summary: "离开桌面时，手机负责接住进度、摘要和下一条回复。", tags: ["iPhone", "Android", "继续回复"] },
-        { name: "网页端 / 平板", summary: "临时打开也能继续，不需要先把背景再解释一遍。", tags: ["浏览器", "平板", "继续工作"] }
+      sectionEyebrow: "能力",
+      title: "把那些不值得人守着的事，交给 CodingNS。",
+      description: "盯进度、等配额、做巡检，这些重复动作都可以自动接住。",
+      media: [
+        {
+          assetPath: "/site-images/capabilities-automation-1.png",
+          alt: "CodingNS 创建自动化流程截图",
+          placeholderLabel: "自动化能力截图一"
+        },
+        {
+          assetPath: "/site-images/capabilities-automation-2.png",
+          alt: "CodingNS 自动化监控结果与计时截图",
+          placeholderLabel: "自动化能力截图二"
+        }
+      ],
+      points: [
+        "让 CodingNS 帮你盯着 Spec 会话的开发进度，还能打开浏览器自动验证。",
+        "Code Plan 到限额？让 CodingNS 帮你盯着，配额恢复后自动恢复工作！",
+        "让 CodingNS 每天帮你生成巡检报告，没问题！"
       ]
     },
     providers: {
-      sectionEyebrow: "分叉",
-      title: "一个方向不够，就从任意节点分出新的会话。",
-      description: "继续试，而不是重新来。",
+      sectionEyebrow: "会话分叉",
+      title: "把同一段思路分成树，再决定哪一支继续往前走。",
+      description: "更适合头脑风暴，也更适合在不同模型之间继续试。",
       cards: [
-        { name: "从消息继续", summary: "不必复制整段上下文，直接从当前节点开始下一种尝试。" },
-        { name: "保留原来链路", summary: "原来的推进过程还在，新方向只是分出去，不是覆盖掉。" },
-        { name: "并排比较", summary: "不同思路可以同时保留，回头判断时更清楚。" },
-        { name: "继续向前试", summary: "试错不是重开一局，而是在现有基础上继续推。" }
+        {
+          name: "图形化会话树",
+          summary: "把主干和所有分支直接展开，切换、回看、比较都更直观，特别适合头脑风暴时同时保留多条思路。"
+        },
+        {
+          name: "跨运营商 Fork",
+          summary: "Codex 卡住了，就从当前节点直接分一支给 Claude Code 或别的模型继续试，不用重讲背景，不用重建上下文。"
+        }
       ],
       media: {
-        key: "providers-shot",
-        eyebrow: "Branching",
-        title: "会话分叉画面",
-        description: "建议放从消息节点分出新会话或分支树相关截图。",
-        assetPath: "/site-images/providers.png",
-        alt: "CodingNS 会话分叉截图",
-        tags: ["横图", "分叉", "继续试"],
-        placeholderLabel: "会话分叉画面"
+        assetPath: "/site-images/providers-branching.png",
+        alt: "CodingNS 图形化会话树截图",
+        placeholderLabel: "会话分叉截图"
       }
     },
-    cta: {
-      eyebrow: "远程",
-      title: "不管项目在本机、远程主机还是云端环境。",
-      description: "CodingNS 都让进入、查看和继续推进更统一。",
-      primaryAction: "回到顶部",
-      secondaryAction: "查看产品画面"
+    remoteAccess: {
+      sectionEyebrow: "远程访问",
+      title: "一键开远程，没公网也能进。",
+      description: "Host 在你机器上，中继帮你连回来。",
+      cards: [
+        {
+          name: "不用折腾公网",
+          summary: "打开就能连。"
+        },
+        {
+          name: "外面也能接着干",
+          summary: "电脑、手机、浏览器都能进。"
+        }
+      ],
+      visual: {
+        devicesTitle: "外部设备",
+        relayTitle: "官方中继",
+        relaySubtitle: "把访问带回 Host",
+        hostTitle: "你的 Host",
+        accessNote: "没公网，也能从外面连回来",
+        deviceLabels: {
+          laptop: "笔记本",
+          mobile: "手机",
+          browser: "浏览器"
+        }
+      }
+    },
+    moreFeatures: {
+      sectionEyebrow: "更多功能",
+      title: "把高频操作收进一组顺手的小工具里。",
+      description: "不是概念功能，而是你每天真的会点开的那几类能力。",
+      cards: [
+        {
+          name: "快捷短语",
+          summary: "把常用提示语单独存起来，高频语句一键填回输入框。",
+          icon: "quick-phrase"
+        },
+        {
+          name: "文件预览",
+          summary: "文本能编辑，HTML 可以直接看效果，图片和 PDF 也能统一预览。",
+          icon: "file-preview"
+        },
+        {
+          name: "调试启动",
+          summary: "先定义服务怎么启动，再一键拉起到终端，日志和端口也放在一起看。",
+          icon: "debug-launch"
+        },
+        {
+          name: "Skill 同步",
+          summary: "多个 CLI 的本地 Skill 统一扫描、纳管和重新同步，不用自己手动搬。",
+          icon: "skill-sync"
+        },
+        {
+          name: "配置切换",
+          summary: "把 CLI 供应商配置图形化展示出来，常用预设一键切换。",
+          icon: "config-switch"
+        },
+        {
+          name: "设备管理",
+          summary: "查看当前设备、其他在线设备和最近登录记录，必要时一键踢出风险设备。",
+          icon: "device-management"
+        },
+        {
+          name: "Git 版本详情",
+          summary: "最近版本、全量历史、提交详情和改动解释都能直接在应用里查看。",
+          icon: "git-history"
+        },
+        {
+          name: "多 Host 切换",
+          summary: "桌面端和移动端都能切换不同 Host，不需要因为换机器就重新整理入口。",
+          icon: "host-switch"
+        },
+        {
+          name: "远程访问",
+          summary: "设置里就能看到远程访问状态、安装引导和访问入口，不用自己再拼链路。",
+          icon: "remote-access"
+        }
+      ]
     },
     footer: {
       summary: "把 CLI、工作区和不同屏幕收进同一条体验里。",
-      copyright: "© 2026 CodingNS"
+      copyright: "© 2026 CodingNS",
+      contactTitle: "联系方式",
+      contactLabel: "QQ群",
+      contactValue: "1092985965"
     }
   },
   "en-US": {
@@ -484,10 +648,12 @@ export const siteCopy: Record<Locale, SiteCopy> = {
       brandMark: "CNS",
       items: [
         { label: "Overview", href: "#overview" },
-        { label: "Visuals", href: "#visuals" },
-        { label: "Platforms", href: "#platforms" },
-        { label: "Compatibility", href: "#providers" }
+        { label: "Core Capabilities", href: "#visuals" },
+        { label: "More Features", href: "#more-features" },
+        { label: "Community", href: "#contact" },
+        { label: "Docs", href: "https://docs.codingns.com", external: true }
       ],
+      githubHref: "https://github.com/jingyi0605/CodingNS",
       themeLabel: "Appearance",
       lightMode: "Light",
       darkMode: "Dark",
@@ -503,7 +669,7 @@ export const siteCopy: Record<Locale, SiteCopy> = {
       subtitle: "Start on any device. Continue on any other screen.",
       description: "The same work carries across devices without breaking.",
       primaryAction: "See product visuals",
-      secondaryAction: "See compatibility",
+      secondaryAction: "See session branching",
       notes: ["Cross-device", "AI relay", "CLI support"],
       devices: {
         macbook: { name: "MacBook", caption: "Full workspace" },
@@ -717,53 +883,171 @@ export const siteCopy: Record<Locale, SiteCopy> = {
       sectionEyebrow: "Workspace",
       title: "A session is more than a chat log.",
       description: "Files, terminal, Git, and context all move with it.",
-      items: [
-        { title: "Files stay beside it", description: "See the conversation and the project files together, without splitting the work apart." },
-        { title: "The terminal keeps running", description: "Commands, output, and recent progress stay close instead of being pushed into another tool." },
-        { title: "Git stays in the loop", description: "Review changes, understand diffs, and keep moving without dropping the session context." }
+      spotlight: {
+        title: "One closed-loop workspace keeps files, Git, and terminal state together.",
+        description: "Instead of bouncing across separate tools, switch views inside the same workspace and keep the work moving forward.",
+        tags: ["File tree", "Git changes", "Process state"]
+      },
+      cards: [
+        {
+          key: "workspace-files",
+          eyebrow: "Files",
+          title: "File management stays inside the workspace",
+          description: "The directory tree, the files, and the current session share one entry point, so the work never splits apart.",
+          assetPath: "/site-images/workspace-files.png",
+          alt: "CodingNS file management screenshot",
+          tags: ["File tree", "Workspace", "Same screen"],
+          placeholderLabel: "File management view"
+        },
+        {
+          key: "workspace-git",
+          eyebrow: "Git",
+          title: "Git changes stay attached to the task at hand",
+          description: "Review diffs, write the commit, and return to the conversation without losing the thread of the work.",
+          assetPath: "/site-images/workspace-git.png",
+          alt: "CodingNS Git management screenshot",
+          tags: ["Diff review", "Commit", "Closed loop"],
+          placeholderLabel: "Git management view"
+        },
+        {
+          key: "workspace-process",
+          eyebrow: "Process",
+          title: "Terminal and launch items close the loop",
+          description: "See whether services are running, whether ports are occupied, and whether a new terminal is needed, all from the same workspace.",
+          assetPath: "/site-images/workspace-process.png",
+          alt: "CodingNS process management screenshot",
+          tags: ["Launch items", "Ports", "Terminal state"],
+          placeholderLabel: "Process management view"
+        }
       ]
     },
     platforms: {
-      sectionEyebrow: "Devices",
-      title: "From desktop to phone, from browser to tablet.",
-      description: "What you leave behind is the screen, not the work.",
-      cards: [
-        { name: "Desktop", summary: "Keep the full workspace on the larger screen when the work needs depth and time.", tags: ["Multi-window", "Files", "Terminal"] },
-        { name: "Mobile", summary: "Leave the desk and use the phone to catch up on progress, summaries, and the next reply.", tags: ["iPhone", "Android", "Reply fast"] },
-        { name: "Web / Tablet", summary: "Open it temporarily and still continue without retelling the background first.", tags: ["Browser", "Tablet", "Continue work"] }
+      sectionEyebrow: "Capabilities",
+      title: "Hand the repetitive watching to CodingNS.",
+      description: "Track progress, wait for quota, and generate daily checks without keeping a person on standby.",
+      media: [
+        {
+          assetPath: "/site-images/capabilities-automation-1.png",
+          alt: "CodingNS automation creation screenshot",
+          placeholderLabel: "Automation capability screenshot one"
+        },
+        {
+          assetPath: "/site-images/capabilities-automation-2.png",
+          alt: "CodingNS automation monitoring and timer screenshot",
+          placeholderLabel: "Automation capability screenshot two"
+        }
+      ],
+      points: [
+        "Let CodingNS watch the progress of a Spec session and even open the browser to verify it automatically.",
+        "Hit the Code Plan quota? Let CodingNS keep watching and resume the work when quota comes back.",
+        "Let CodingNS generate a daily inspection report for you. No problem."
       ]
     },
     providers: {
-      sectionEyebrow: "Branching",
-      title: "When one direction is not enough, branch from any point.",
-      description: "Keep trying instead of starting over.",
+      sectionEyebrow: "Session Branching",
+      title: "Turn one line of thought into a tree, then decide which branch deserves the next step.",
+      description: "Better for brainstorming, and better for continuing the work across different models.",
       cards: [
-        { name: "Continue from any message", summary: "Start the next attempt from the current node instead of rebuilding the whole context." },
-        { name: "Keep the original path", summary: "The existing line of work stays intact while the new direction branches away from it." },
-        { name: "Compare side by side", summary: "Multiple ideas can stay alive at once, which makes the next decision clearer." },
-        { name: "Push the work forward", summary: "Experimentation becomes a continuation of the work, not a reset." }
+        {
+          name: "Visual Session Tree",
+          summary: "See the trunk and every branch together so switching, reviewing, and comparing feel natural, especially during brainstorming."
+        },
+        {
+          name: "Cross-Provider Fork",
+          summary: "If Codex gets stuck, branch from the current node and let Claude Code or another model take a shot without rebuilding the context."
+        }
       ],
       media: {
-        key: "providers-shot",
-        eyebrow: "Branching",
-        title: "Session branching visual",
-        description: "Use a screenshot that shows branching from a message or a visible branch tree.",
-        assetPath: "/site-images/providers.png",
-        alt: "CodingNS session branching screenshot",
-        tags: ["Landscape", "Branching", "Try next"],
-        placeholderLabel: "Session branching view"
+        assetPath: "/site-images/providers-branching.png",
+        alt: "CodingNS visual session tree screenshot",
+        placeholderLabel: "Session branching screenshot"
       }
     },
-    cta: {
-      eyebrow: "Remote",
-      title: "Whether the project lives locally, on a remote host, or in the cloud.",
-      description: "CodingNS keeps entering, viewing, and continuing the work more consistent.",
-      primaryAction: "Back to top",
-      secondaryAction: "See product visuals"
+    remoteAccess: {
+      sectionEyebrow: "Remote Access",
+      title: "Turn on remote access in one click, even without a public address.",
+      description: "Your Host stays local. The relay brings it back.",
+      cards: [
+        {
+          name: "Skip public IP setup",
+          summary: "Turn it on and connect."
+        },
+        {
+          name: "Keep working outside",
+          summary: "Laptop, phone, and browser all get in."
+        }
+      ],
+      visual: {
+        devicesTitle: "External Devices",
+        relayTitle: "Official Relay",
+        relaySubtitle: "Carry access back to your Host",
+        hostTitle: "Your Host",
+        accessNote: "No public address, and still reachable from outside",
+        deviceLabels: {
+          laptop: "Laptop",
+          mobile: "Mobile",
+          browser: "Browser"
+        }
+      }
+    },
+    moreFeatures: {
+      sectionEyebrow: "More Features",
+      title: "Keep the everyday actions inside one workspace.",
+      description: "These are the small tools you actually click every day, not abstract platform claims.",
+      cards: [
+        {
+          name: "Quick Phrases",
+          summary: "Save the prompts you send all the time and drop them back into the input box with one click.",
+          icon: "quick-phrase"
+        },
+        {
+          name: "File Preview",
+          summary: "Edit text files, preview HTML directly, and keep images and PDFs in the same viewer flow.",
+          icon: "file-preview"
+        },
+        {
+          name: "Debug Launch",
+          summary: "Define how a service should start, launch it into the terminal, and keep logs and ports nearby.",
+          icon: "debug-launch"
+        },
+        {
+          name: "Skill Sync",
+          summary: "Scan, manage, and re-sync local Skills across multiple CLI providers without moving files by hand.",
+          icon: "skill-sync"
+        },
+        {
+          name: "Config Switching",
+          summary: "Turn CLI provider presets into a visual switcher so the one you need is one click away.",
+          icon: "config-switch"
+        },
+        {
+          name: "Device Management",
+          summary: "Review the current device, other online devices, and recent logins, then remove risky devices when needed.",
+          icon: "device-management"
+        },
+        {
+          name: "Git History",
+          summary: "Open recent versions, full history, commit details, and change explanations without leaving the app.",
+          icon: "git-history"
+        },
+        {
+          name: "Multi-Host Switching",
+          summary: "Move between different Hosts on desktop and mobile without rebuilding the way you work each time.",
+          icon: "host-switch"
+        },
+        {
+          name: "Remote Access",
+          summary: "Check status, setup guidance, and access entry points from settings instead of stitching the path together yourself.",
+          icon: "remote-access"
+        }
+      ]
     },
     footer: {
       summary: "Bring CLI, workspace, and every screen into one continuous flow.",
-      copyright: "© 2026 CodingNS"
+      copyright: "© 2026 CodingNS",
+      contactTitle: "Contact",
+      contactLabel: "QQ Group",
+      contactValue: "1092985965"
     }
   }
 };
