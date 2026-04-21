@@ -577,7 +577,7 @@ export const siteCopy: Record<Locale, SiteCopy> = {
         }
       ],
       detailAction: "查看详情",
-      detailActionHref: "https://channel.codingns.com:111.62.241.102:10247",
+      detailActionHref: "https://channel.codingns.com:10247",
       visual: {
         devicesTitle: "外部设备",
         relayTitle: "官方中继",
@@ -992,7 +992,7 @@ export const siteCopy: Record<Locale, SiteCopy> = {
         }
       ],
       detailAction: "View details",
-      detailActionHref: "https://channel.codingns.com:111.62.241.102:10247",
+      detailActionHref: "https://channel.codingns.com:10247",
       visual: {
         devicesTitle: "External Devices",
         relayTitle: "Official Relay",
