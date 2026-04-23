@@ -345,6 +345,160 @@ button {
   font-size: 0.92rem;
 }
 
+.install-section {
+  scroll-margin-top: 112px;
+}
+
+.install-section .section-heading {
+  max-width: 760px;
+  margin: 0 auto 18px;
+}
+
+.install-command-panel {
+  width: min(100%, 840px);
+  margin: 0 auto;
+  overflow: hidden;
+  border-radius: 20px;
+  background: var(--surface-strong);
+  box-shadow: inset 0 0 0 1px var(--surface-border);
+}
+
+.install-command-tabs {
+  display: flex;
+  gap: 4px;
+  padding: 6px 8px;
+  border-bottom: 1px solid var(--surface-border);
+  background: color-mix(in srgb, var(--surface-strong) 86%, transparent);
+}
+
+.install-command-tab {
+  border: 0;
+  border-radius: 999px;
+  padding: 10px 14px;
+  background: transparent;
+  color: var(--text-tertiary);
+  font-size: 0.92rem;
+  font-weight: 700;
+  cursor: pointer;
+  transition: background-color 160ms ease, color 160ms ease;
+}
+
+.install-command-tab:hover,
+.install-command-tab:focus-visible {
+  color: var(--text-primary);
+}
+
+.install-command-tab.is-active {
+  background: var(--bg);
+  color: var(--text-primary);
+  box-shadow: inset 0 0 0 1px var(--surface-border);
+}
+
+.install-command-body {
+  display: grid;
+  gap: 12px;
+  padding: 16px 18px 20px;
+}
+
+.install-command-row {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 12px;
+  align-items: center;
+}
+
+.install-command-row code {
+  display: block;
+  overflow-x: auto;
+  padding: 14px 16px;
+  border-radius: 14px;
+  background: rgba(16, 18, 25, 0.94);
+  color: #f7f9ff;
+  font-family: "SFMono-Regular", "SFMono-Regular", Consolas, "Liberation Mono", Menlo, monospace;
+  font-size: 0.94rem;
+  line-height: 1.5;
+  white-space: nowrap;
+}
+
+.install-copy-button {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  min-height: 42px;
+  padding: 0 14px;
+  border: 0;
+  border-radius: 999px;
+  background: linear-gradient(135deg, var(--text-primary), color-mix(in srgb, var(--text-primary) 78%, var(--accent)));
+  color: var(--bg);
+  font-size: 0.9rem;
+  font-weight: 700;
+  cursor: pointer;
+  box-shadow: 0 18px 36px rgba(9, 15, 30, 0.18);
+  transition: transform 160ms ease, opacity 160ms ease;
+}
+
+.install-copy-button:hover,
+.install-copy-button:focus-visible {
+  transform: translateY(-1px);
+}
+
+.install-copy-button.is-copied {
+  background: linear-gradient(135deg, #159a64, #0b8050);
+}
+
+.install-copy-button svg {
+  width: 18px;
+  height: 18px;
+  flex: 0 0 auto;
+}
+
+.install-command-summary,
+.install-command-helper {
+  margin: 0;
+  color: var(--text-secondary);
+  line-height: 1.7;
+}
+
+.install-command-helper {
+  color: var(--text-tertiary);
+  font-size: 0.9rem;
+}
+
+.install-command-links {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px 18px;
+  align-items: center;
+}
+
+.install-next-step-link {
+  display: inline-flex;
+  align-items: center;
+  width: fit-content;
+  color: var(--accent);
+  font-size: 0.92rem;
+  font-weight: 700;
+}
+
+.install-next-step-link:hover,
+.install-next-step-link:focus-visible {
+  text-decoration: underline;
+}
+
+.install-docs-link {
+  display: inline-flex;
+  align-items: center;
+  width: fit-content;
+  color: var(--text-primary);
+  font-size: 0.92rem;
+  font-weight: 700;
+}
+
+.install-docs-link:hover,
+.install-docs-link:focus-visible {
+  text-decoration: underline;
+}
+
 .hero-flow {
   position: relative;
   min-height: 760px;
@@ -4000,6 +4154,14 @@ button {
     border-radius: 28px;
   }
 
+  .install-command-row {
+    grid-template-columns: 1fr;
+  }
+
+  .install-copy-button {
+    justify-self: start;
+  }
+
   .highlight-list,
   .platform-grid,
   .platforms-showcase,
@@ -4188,6 +4350,24 @@ button {
   .icon-switch-button {
     width: 42px;
     min-width: 42px;
+  }
+
+  .install-command-tabs {
+    flex-wrap: wrap;
+  }
+
+  .install-command-body {
+    padding: 14px;
+  }
+
+  .install-command-row code {
+    padding: 13px 14px;
+    font-size: 0.88rem;
+  }
+
+  .install-copy-button {
+    width: 100%;
+    justify-content: center;
   }
 
   .hero-flow {

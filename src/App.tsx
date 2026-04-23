@@ -1,6 +1,8 @@
 import { useEffect, useMemo, useRef, useState, type CSSProperties } from "react";
 
 import {
+  type InstallMethod,
+  type InstallMethodId,
   siteCopy,
   type FeatureIconName,
   type HighlightSection,
@@ -557,6 +559,8 @@ export function App() {
   const [theme, setTheme] = useState<ThemeMode>(() => resolveDefaultTheme());
   const [frontDeviceIndex, setFrontDeviceIndex] = useState(0);
   const [platformMediaIndex, setPlatformMediaIndex] = useState(0);
+  const [installMethodId, setInstallMethodId] = useState<InstallMethodId>("curl");
+  const [copiedInstallMethodId, setCopiedInstallMethodId] = useState<InstallMethodId | null>(null);
   const pageVisible = usePageVisibility();
   const [heroSectionRef, heroSectionActive] = useSectionActivity<HTMLElement>(0.42, pageVisible);
   const [visualsSectionRef, visualsSectionActive] = useSectionActivity<HTMLElement>(0.28, pageVisible);
@@ -564,6 +568,22 @@ export function App() {
   const [remoteAccessSectionRef, remoteAccessSectionActive] = useSectionActivity<HTMLElement>(0.26, pageVisible);
 
   const copy = useMemo(() => siteCopy[locale], [locale]);
+  const siteOrigin = useMemo(() => {
+    if (typeof window !== "undefined" && window.location.origin) {
+      return window.location.origin.replace(/\/$/, "");
+    }
+
+    return "https://codingns.com";
+  }, []);
+  const installCommands = useMemo<Record<InstallMethodId, string>>(
+    () => ({
+      curl: `curl -fsSL ${siteOrigin}/install | bash`,
+      npm: "npm install -g @jingyi0605/codingns"
+    }),
+    [siteOrigin]
+  );
+  const activeInstallMethod =
+    copy.install.methods.find((method) => method.id === installMethodId) ?? copy.install.methods[0];
   const alternateLocale = locale === "zh-CN" ? "en-US" : "zh-CN";
   const currentPlatformMedia = copy.platforms.media[platformMediaIndex] ?? copy.platforms.media[0];
   const platformsImageAvailable = useAssetAvailable(currentPlatformMedia.assetPath);
@@ -612,6 +632,10 @@ export function App() {
   }, [locale]);
 
   useEffect(() => {
+    setCopiedInstallMethodId(null);
+  }, [installMethodId, locale]);
+
+  useEffect(() => {
     if (copy.platforms.media.length < 2) {
       return;
     }
@@ -628,6 +652,48 @@ export function App() {
       window.clearInterval(timer);
     };
   }, [copy.platforms.media.length, platformsSectionActive]);
+
+  useEffect(() => {
+    if (copiedInstallMethodId === null) {
+      return;
+    }
+
+    const timer = window.setTimeout(() => {
+      setCopiedInstallMethodId(null);
+    }, 1800);
+
+    return () => {
+      window.clearTimeout(timer);
+    };
+  }, [copiedInstallMethodId]);
+
+  async function handleInstallCommandCopy(methodId: InstallMethodId) {
+    const command = installCommands[methodId];
+
+    if (!command) {
+      return;
+    }
+
+    try {
+      if (typeof navigator !== "undefined" && navigator.clipboard?.writeText) {
+        await navigator.clipboard.writeText(command);
+      } else if (typeof document !== "undefined") {
+        const textarea = document.createElement("textarea");
+        textarea.value = command;
+        textarea.setAttribute("readonly", "true");
+        textarea.style.position = "absolute";
+        textarea.style.left = "-9999px";
+        document.body.appendChild(textarea);
+        textarea.select();
+        document.execCommand("copy");
+        document.body.removeChild(textarea);
+      }
+
+      setCopiedInstallMethodId(methodId);
+    } catch (error) {
+      console.error("[codingns-site] copy install command failed", error);
+    }
+  }
 
   return (
     <div className="page-shell">
@@ -723,6 +789,31 @@ export function App() {
             frontDeviceIndex={frontDeviceIndex}
             onSelectDevice={setFrontDeviceIndex}
             isActive={heroSectionActive}
+          />
+        </section>
+
+        <section className="section stacked-section install-section" id="install">
+          <SectionHeading
+            eyebrow={copy.install.sectionEyebrow}
+            title={copy.install.title}
+            description={copy.install.description}
+          />
+
+          <InstallCommandPanel
+            methods={copy.install.methods}
+            activeMethodId={activeInstallMethod.id}
+            activeCommand={installCommands[activeInstallMethod.id]}
+            copiedMethodId={copiedInstallMethodId}
+            tabsAriaLabel={copy.install.tabsLabel}
+            copyActionLabel={copy.install.copyAction}
+            copiedActionLabel={copy.install.copiedAction}
+            helperText={copy.install.helper}
+            nextStepLabel={copy.install.nextStepLabel}
+            nextStepHref={copy.install.nextStepHref}
+            docsLabel={copy.install.docsLabel}
+            docsHref={copy.install.docsHref}
+            onSelectMethod={setInstallMethodId}
+            onCopyCommand={handleInstallCommandCopy}
           />
         </section>
 
@@ -1085,6 +1176,44 @@ function GitHubIcon() {
   );
 }
 
+function CopyIcon() {
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      <path
+        d="M9 8.5h8.5A1.5 1.5 0 0 1 19 10v9A1.5 1.5 0 0 1 17.5 20h-9A1.5 1.5 0 0 1 7 18.5V10A1.5 1.5 0 0 1 8.5 8.5Z"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="1.7"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+      <path
+        d="M5.5 15.5H5A1.5 1.5 0 0 1 3.5 14V5A1.5 1.5 0 0 1 5 3.5h9A1.5 1.5 0 0 1 15.5 5v.5"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="1.7"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
+  );
+}
+
+function CheckIcon() {
+  return (
+    <svg viewBox="0 0 24 24" aria-hidden="true">
+      <path
+        d="m5.5 12.5 4.2 4.2L18.5 8"
+        fill="none"
+        stroke="currentColor"
+        strokeWidth="1.9"
+        strokeLinecap="round"
+        strokeLinejoin="round"
+      />
+    </svg>
+  );
+}
+
 type LanguageSwitchIconProps = {
   locale: Locale;
 };
@@ -1120,6 +1249,88 @@ function SectionHeading({ eyebrow, title, description }: SectionHeadingProps) {
       <h2>{title}</h2>
       <p>{description}</p>
     </div>
+  );
+}
+
+type InstallCommandPanelProps = {
+  methods: InstallMethod[];
+  activeMethodId: InstallMethodId;
+  activeCommand: string;
+  copiedMethodId: InstallMethodId | null;
+  tabsAriaLabel: string;
+  copyActionLabel: string;
+  copiedActionLabel: string;
+  helperText: string;
+  nextStepLabel: string;
+  nextStepHref: string;
+  docsLabel: string;
+  docsHref: string;
+  onSelectMethod: (methodId: InstallMethodId) => void;
+  onCopyCommand: (methodId: InstallMethodId) => void;
+};
+
+function InstallCommandPanel({
+  methods,
+  activeMethodId,
+  activeCommand,
+  copiedMethodId,
+  tabsAriaLabel,
+  copyActionLabel,
+  copiedActionLabel,
+  helperText,
+  nextStepLabel,
+  nextStepHref,
+  docsLabel,
+  docsHref,
+  onSelectMethod,
+  onCopyCommand
+}: InstallCommandPanelProps) {
+  const activeMethod = methods.find((method) => method.id === activeMethodId) ?? methods[0];
+
+  return (
+    <article className="install-command-panel">
+      <div className="install-command-tabs" role="tablist" aria-label={tabsAriaLabel}>
+        {methods.map((method) => (
+          <button
+            key={method.id}
+            type="button"
+            role="tab"
+            className={`install-command-tab${method.id === activeMethodId ? " is-active" : ""}`}
+            aria-selected={method.id === activeMethodId}
+            onClick={() => onSelectMethod(method.id)}
+          >
+            {method.label}
+          </button>
+        ))}
+      </div>
+
+      <div className="install-command-body">
+        <div className="install-command-row">
+          <code>{activeCommand}</code>
+          <button
+            type="button"
+            className={`install-copy-button${copiedMethodId === activeMethod.id ? " is-copied" : ""}`}
+            onClick={() => onCopyCommand(activeMethod.id)}
+            aria-label={copiedMethodId === activeMethod.id ? copiedActionLabel : copyActionLabel}
+          >
+            {copiedMethodId === activeMethod.id ? <CheckIcon /> : <CopyIcon />}
+            <span>{copiedMethodId === activeMethod.id ? copiedActionLabel : copyActionLabel}</span>
+          </button>
+        </div>
+        <p className="install-command-summary">{activeMethod.summary}</p>
+        <p className="install-command-helper">{helperText}</p>
+        <div className="install-command-links">
+          {activeMethod.id === "npm" ? (
+            <a className="install-next-step-link" href={nextStepHref} target="_blank" rel="noreferrer">
+              {nextStepLabel}
+            </a>
+          ) : null}
+          <a className="install-docs-link" href={docsHref} target="_blank" rel="noreferrer">
+            {docsLabel}
+          </a>
+        </div>
+      </div>
+    </article>
   );
 }
 

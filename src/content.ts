@@ -70,6 +70,29 @@ type FeatureCard = {
   icon: FeatureIconName;
 };
 
+export type InstallMethodId = "curl" | "npm";
+
+export type InstallMethod = {
+  id: InstallMethodId;
+  label: string;
+  summary: string;
+};
+
+type InstallSection = {
+  sectionEyebrow: string;
+  title: string;
+  description: string;
+  tabsLabel: string;
+  methods: InstallMethod[];
+  copyAction: string;
+  copiedAction: string;
+  helper: string;
+  nextStepLabel: string;
+  nextStepHref: string;
+  docsLabel: string;
+  docsHref: string;
+};
+
 type DeviceLabel = {
   name: string;
   caption: string;
@@ -226,6 +249,7 @@ type SiteCopy = {
     description: string;
     cards: FeatureCard[];
   };
+  install: InstallSection;
   footer: {
     summary: string;
     copyright: string;
@@ -267,8 +291,7 @@ export const siteCopy: Record<Locale, SiteCopy> = {
       primaryAction: "查看核心能力",
       primaryActionHref: "#visuals",
       secondaryAction: "开始使用",
-      secondaryActionHref: "https://github.com/jingyi0605/CodingNS/releases",
-      secondaryActionExternal: true,
+      secondaryActionHref: "#install",
       notes: ["多端连续", "AI 接力", "CLI 兼容"],
       devices: {
         macbook: { name: "MacBook", caption: "完整工作区" },
@@ -643,6 +666,31 @@ export const siteCopy: Record<Locale, SiteCopy> = {
         }
       ]
     },
+    install: {
+      sectionEyebrow: "安装",
+      title: "一条命令装上去，开始接住你的 CLI 会话。",
+      description: "支持一键脚本和 npm 安装。脚本会继续处理依赖检查、端口、数据目录、CLI 检测，以及服务安装和开机自启。",
+      tabsLabel: "安装方式",
+      methods: [
+        {
+          id: "curl",
+          label: "curl",
+          summary: "适合直接一键安装，自动处理依赖补齐、npm 源回退、服务托管和开机自启。"
+        },
+        {
+          id: "npm",
+          label: "npm",
+          summary: "适合你自己掌控安装过程，后续再按需要手工启动或接入 PM2。"
+        }
+      ],
+      copyAction: "复制命令",
+      copiedAction: "已复制",
+      helper: "如果你更谨慎，也可以先把脚本下载下来再看一眼，再执行。",
+      nextStepLabel: "查看 npm 安装后的后续操作",
+      nextStepHref: "https://docs.codingns.com/quick-install/host-installation",
+      docsLabel: "查看官方安装文档",
+      docsHref: "https://docs.codingns.com/quick-install/host-installation"
+    },
     footer: {
       summary: "把 CLI、工作区和不同屏幕收进同一条体验里。",
       copyright: "© 2026 CodingNS",
@@ -682,8 +730,7 @@ export const siteCopy: Record<Locale, SiteCopy> = {
       primaryAction: "See core capabilities",
       primaryActionHref: "#visuals",
       secondaryAction: "Get started",
-      secondaryActionHref: "https://github.com/jingyi0605/CodingNS/releases",
-      secondaryActionExternal: true,
+      secondaryActionHref: "#install",
       notes: ["Cross-device", "AI relay", "CLI support"],
       devices: {
         macbook: { name: "MacBook", caption: "Full workspace" },
@@ -1057,6 +1104,31 @@ export const siteCopy: Record<Locale, SiteCopy> = {
           icon: "remote-access"
         }
       ]
+    },
+    install: {
+      sectionEyebrow: "Install",
+      title: "Install it with one command and start catching your CLI sessions.",
+      description: "Use the one-line script or plain npm install. The script continues with dependency checks, port setup, data path, CLI detection, service installation, and startup setup.",
+      tabsLabel: "Installation methods",
+      methods: [
+        {
+          id: "curl",
+          label: "curl",
+          summary: "Best for one-line setup, including prerequisite checks, npm registry fallback, service management, and startup configuration."
+        },
+        {
+          id: "npm",
+          label: "npm",
+          summary: "Best if you want to control the installation steps yourself and wire PM2 manually afterwards."
+        }
+      ],
+      copyAction: "Copy command",
+      copiedAction: "Copied",
+      helper: "If you prefer a safer flow, download the script first, inspect it, and then run it locally.",
+      nextStepLabel: "See the next steps after npm install",
+      nextStepHref: "https://docs.codingns.com/quick-install/host-installation",
+      docsLabel: "Open the official install guide",
+      docsHref: "https://docs.codingns.com/quick-install/host-installation"
     },
     footer: {
       summary: "Bring CLI, workspace, and every screen into one continuous flow.",
