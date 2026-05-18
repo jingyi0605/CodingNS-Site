@@ -262,7 +262,7 @@ type SiteCopy = {
 export const siteCopy: Record<Locale, SiteCopy> = {
   "zh-CN": {
     metaTitle: "CodingNS | 你的 CLI 会话，出现在每一块屏幕上",
-    metaDescription: "CodingNS 让同一段会话在桌面、移动端和网页端之间继续流转，并兼容多种 CLI 工具。",
+    metaDescription: "CodingNS 让同一段会话在桌面、移动端和网页端之间继续流转，并把工作区助手、浏览器任务和静态 HTML 演示编辑也收进同一套体验里。",
     nav: {
       brand: "CodingNS",
       brandMark: "CNS",
@@ -504,7 +504,7 @@ export const siteCopy: Record<Locale, SiteCopy> = {
     highlights: {
       sectionEyebrow: "工作区",
       title: "一段会话，不只是聊天记录。",
-      description: "文件、终端、Git 和上下文都会一起跟上。",
+      description: "文件、终端、Git、浏览器任务和上下文都会一起跟上。",
       spotlight: {
         title: "在一个闭环工作区里，同时接住文件、Git 和终端。",
         description: "不是在三个工具之间来回找，而是在同一块工作区里切换视角、确认状态、继续推进。",
@@ -545,8 +545,8 @@ export const siteCopy: Record<Locale, SiteCopy> = {
     },
     platforms: {
       sectionEyebrow: "能力",
-      title: "把那些不值得人守着的事，交给 CodingNS。",
-      description: "盯进度、等配额、做巡检，这些重复动作都可以自动接住。",
+      title: "把浏览器任务、办公动作和自动化一起收进来。",
+      description: "盯进度、读页面、截图、接住登录态，这些事不该再让人手工反复做。",
       media: [
         {
           assetPath: "/site-images/capabilities-automation-1.png",
@@ -560,9 +560,9 @@ export const siteCopy: Record<Locale, SiteCopy> = {
         }
       ],
       points: [
-        "让 CodingNS 帮你盯着 Spec 会话的开发进度，还能打开浏览器自动验证。",
-        "Code Plan 到限额？让 CodingNS 帮你盯着，配额恢复后自动恢复工作！",
-        "让 CodingNS 每天帮你生成巡检报告，没问题！"
+        "让 CodingNS 帮你盯着 Spec 会话的开发进度，还能直接发起浏览器任务做页面验证。",
+        "需要复用真实 Chrome 或 Edge 登录态时，可以显式切到浏览器桥接链路继续执行。",
+        "静态 HTML 演示稿也能直接打开成演示视图，边改边看结果。"
       ]
     },
     providers: {
@@ -626,7 +626,7 @@ export const siteCopy: Record<Locale, SiteCopy> = {
         },
         {
           name: "文件预览",
-          summary: "文本能编辑，HTML 可以直接看效果，图片和 PDF 也能统一预览。",
+          summary: "文本能编辑，HTML / PDF / 图片能统一预览，静态 HTML 演示稿还能直接进入演示编辑视图。",
           icon: "file-preview"
         },
         {
@@ -640,8 +640,8 @@ export const siteCopy: Record<Locale, SiteCopy> = {
           icon: "skill-sync"
         },
         {
-          name: "配置切换",
-          summary: "把 CLI 供应商配置图形化展示出来，常用预设一键切换。",
+          name: "工作区助手",
+          summary: "普通工作区会话也能调用受控的文档、浏览器和运维入口，但不会越权乱跑。",
           icon: "config-switch"
         },
         {
@@ -660,8 +660,8 @@ export const siteCopy: Record<Locale, SiteCopy> = {
           icon: "host-switch"
         },
         {
-          name: "远程访问",
-          summary: "设置里就能看到远程访问状态、安装引导和访问入口，不用自己再拼链路。",
+          name: "浏览器桥接",
+          summary: "需要真实浏览器登录态时，可以把 Chrome / Edge 通过桥接接进任务链路，不用再手工来回切。",
           icon: "remote-access"
         }
       ]
@@ -701,7 +701,7 @@ export const siteCopy: Record<Locale, SiteCopy> = {
   },
   "en-US": {
     metaTitle: "CodingNS | Your CLI Session, On Every Screen",
-    metaDescription: "CodingNS keeps the same session moving across desktop, mobile, and web, with broad CLI compatibility.",
+    metaDescription: "CodingNS keeps the same session moving across desktop, mobile, and web, while adding workspace assistant actions, browser tasks, and static HTML presentation editing to the same flow.",
     nav: {
       brand: "CodingNS",
       brandMark: "CNS",
@@ -943,7 +943,7 @@ export const siteCopy: Record<Locale, SiteCopy> = {
     highlights: {
       sectionEyebrow: "Workspace",
       title: "A session is more than a chat log.",
-      description: "Files, terminal, Git, and context all move with it.",
+      description: "Files, terminal, Git, browser tasks, and context all move with it.",
       spotlight: {
         title: "One closed-loop workspace keeps files, Git, and terminal state together.",
         description: "Instead of bouncing across separate tools, switch views inside the same workspace and keep the work moving forward.",
@@ -984,8 +984,8 @@ export const siteCopy: Record<Locale, SiteCopy> = {
     },
     platforms: {
       sectionEyebrow: "Capabilities",
-      title: "Hand the repetitive watching to CodingNS.",
-      description: "Track progress, wait for quota, and generate daily checks without keeping a person on standby.",
+      title: "Bring browser tasks, office actions, and automation into one flow.",
+      description: "Track progress, read pages, capture screenshots, and reuse real login state without bouncing between tools.",
       media: [
         {
           assetPath: "/site-images/capabilities-automation-1.png",
@@ -999,9 +999,9 @@ export const siteCopy: Record<Locale, SiteCopy> = {
         }
       ],
       points: [
-        "Let CodingNS watch the progress of a Spec session and even open the browser to verify it automatically.",
-        "Hit the Code Plan quota? Let CodingNS keep watching and resume the work when quota comes back.",
-        "Let CodingNS generate a daily inspection report for you. No problem."
+        "Let CodingNS watch the progress of a Spec session and launch browser tasks to verify the page automatically.",
+        "When a real Chrome or Edge login state matters, switch to the bridge backend instead of starting from a blank browser.",
+        "Open slide-style HTML files in a presentation view and keep editing while seeing the result immediately."
       ]
     },
     providers: {
@@ -1065,7 +1065,7 @@ export const siteCopy: Record<Locale, SiteCopy> = {
         },
         {
           name: "File Preview",
-          summary: "Edit text files, preview HTML directly, and keep images and PDFs in the same viewer flow.",
+          summary: "Edit text files, preview HTML, PDFs, and images in one place, and open slide-style HTML files in a presentation editor.",
           icon: "file-preview"
         },
         {
@@ -1079,8 +1079,8 @@ export const siteCopy: Record<Locale, SiteCopy> = {
           icon: "skill-sync"
         },
         {
-          name: "Config Switching",
-          summary: "Turn CLI provider presets into a visual switcher so the one you need is one click away.",
+          name: "Workspace Assistant",
+          summary: "Regular workspace sessions can call controlled document, browser, and ops entry points without turning into an unrestricted control plane.",
           icon: "config-switch"
         },
         {
@@ -1099,8 +1099,8 @@ export const siteCopy: Record<Locale, SiteCopy> = {
           icon: "host-switch"
         },
         {
-          name: "Remote Access",
-          summary: "Check status, setup guidance, and access entry points from settings instead of stitching the path together yourself.",
+          name: "Browser Bridge",
+          summary: "When you need a real browser login state, bridge Chrome or Edge into the task flow instead of repeating the steps by hand.",
           icon: "remote-access"
         }
       ]
