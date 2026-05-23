@@ -5,6 +5,52 @@ function Write-CodingNSInfo {
   Write-Host "[codingns-install] $Message"
 }
 
+function Resolve-CodingNSWinget {
+  $winget = Get-Command winget.exe -ErrorAction SilentlyContinue
+  if ($winget -and $winget.Source) {
+    return $winget.Source
+  }
+
+  return $null
+}
+
+function Install-CodingNSGitForWindows {
+  $wingetPath = Resolve-CodingNSWinget
+  if (-not $wingetPath) {
+    Write-Host ""
+    Write-CodingNSInfo "Git Bash was not found, and winget is not available on this machine."
+    Write-CodingNSInfo "Please install Git for Windows manually, then run this command again: winget install --id Git.Git -e --source winget"
+    exit 1
+  }
+
+  Write-Host ""
+  Write-CodingNSInfo "Git Bash was not found. Installing Git for Windows with winget..."
+  Write-CodingNSInfo "Command: winget install --id Git.Git -e --source winget --accept-package-agreements --accept-source-agreements"
+
+  & $wingetPath install --id Git.Git -e --source winget --accept-package-agreements --accept-source-agreements
+  $exitCode = $LASTEXITCODE
+  if ($exitCode -ne 0) {
+    Write-Host ""
+    Write-CodingNSInfo "Git for Windows installation failed. winget exit code: $exitCode"
+    Write-CodingNSInfo "Please install Git for Windows manually, then run this command again."
+    exit $exitCode
+  }
+
+  $bashPath = $null
+  for ($index = 0; $index -lt 10; $index += 1) {
+    $bashPath = Resolve-CodingNSBash
+    if ($bashPath) {
+      return $bashPath
+    }
+    Start-Sleep -Seconds 1
+  }
+
+  Write-Host ""
+  Write-CodingNSInfo "Git for Windows was installed, but Git Bash is still not available in the expected locations."
+  Write-CodingNSInfo "Please open a new PowerShell window and run the install command again."
+  exit 1
+}
+
 function Resolve-CodingNSBash {
   $candidates = New-Object System.Collections.Generic.List[string]
 
@@ -61,10 +107,7 @@ Invoke-WebRequest -UseBasicParsing -Uri $installUrl -OutFile $installScript
 
 $bashPath = Resolve-CodingNSBash
 if (-not $bashPath) {
-  Write-Host ""
-  Write-CodingNSInfo "Windows one-click installer needs Git Bash to run the CodingNS install flow."
-  Write-CodingNSInfo "Install Git for Windows first, then run this command again: winget install --id Git.Git -e --source winget"
-  exit 1
+  $bashPath = Install-CodingNSGitForWindows
 }
 
 Write-CodingNSInfo "Using Bash: $bashPath"

@@ -680,7 +680,7 @@ export const siteCopy: Record<Locale, SiteCopy> = {
         {
           id: "powershell",
           label: "Windows",
-          summary: "适合在 Windows 上一键安装。请在 PowerShell 中执行这条命令；脚本会下载并运行安装流程，使用 CodingNS 私有 Node.js 22，不要求你手动切换系统 Node。"
+          summary: "适合在 Windows 上一键安装。请在 PowerShell 中执行这条命令；如果缺少 Git Bash，脚本会先通过 winget 安装 Git for Windows，再继续安装 CodingNS。"
         },
         {
           id: "npm",
@@ -690,7 +690,7 @@ export const siteCopy: Record<Locale, SiteCopy> = {
       ],
       copyAction: "复制命令",
       copiedAction: "已复制",
-      helper: "如果你更谨慎，也可以先把脚本下载下来检查，再执行。Windows 命令请在 PowerShell 中运行，脚本会调用本机 Git Bash 执行安装流程。",
+      helper: "如果你更谨慎，也可以先把脚本下载下来检查，再执行。Windows 命令请在 PowerShell 中运行；脚本会自动补齐 Git for Windows，并使用私有 Node.js 22 安装 CodingNS。",
       nextStepLabel: "查看 npm 安装后的后续操作",
       nextStepHref: "https://docs.codingns.com/quick-install/host-installation",
       docsLabel: "查看官方安装文档",
@@ -1124,7 +1124,7 @@ export const siteCopy: Record<Locale, SiteCopy> = {
         {
           id: "powershell",
           label: "Windows",
-          summary: "Best for one-line setup on Windows. Run this command in PowerShell. It downloads and runs the installer with the CodingNS-managed Node.js 22 runtime, so you do not need to switch your system Node manually."
+          summary: "Best for one-line setup on Windows. Run this command in PowerShell. If Git Bash is missing, the script installs Git for Windows with winget first, then continues the CodingNS install."
         },
         {
           id: "npm",
@@ -1134,7 +1134,7 @@ export const siteCopy: Record<Locale, SiteCopy> = {
       ],
       copyAction: "Copy command",
       copiedAction: "Copied",
-      helper: "If you prefer a safer flow, download the script first, inspect it, and then run it locally. Run the Windows command in PowerShell; the script will call Git Bash to run the installer.",
+      helper: "If you prefer a safer flow, download the script first, inspect it, and then run it locally. Run the Windows command in PowerShell; the script can install Git for Windows automatically and then uses the private Node.js 22 runtime for CodingNS.",
       nextStepLabel: "See the next steps after npm install",
       nextStepHref: "https://docs.codingns.com/quick-install/host-installation",
       docsLabel: "Open the official install guide",
