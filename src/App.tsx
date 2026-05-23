@@ -578,6 +578,7 @@ export function App() {
   const installCommands = useMemo<Record<InstallMethodId, string>>(
     () => ({
       curl: `curl -fsSL ${siteOrigin}/install | bash`,
+      powershell: `irm ${siteOrigin}/install.ps1 | iex`,
       npm: "npm install -g @jingyi0605/codingns"
     }),
     [siteOrigin]
