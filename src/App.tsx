@@ -21,11 +21,165 @@ type ThemeMode = "light" | "dark";
 const HERO_DEVICE_COUNT = 5;
 const HERO_ROTATE_INTERVAL_MS = 4000;
 const PLATFORM_ROTATE_INTERVAL_MS = 3600;
+const HERO_DEVICE_TRANSITION_MS = 1800;
+const HERO_WORKSPACE_SCROLL_MS = 18000;
+const HERO_MOBILE_SCROLL_MS = 14000;
+const HERO_SESSION_FLOAT_MS = 6800;
 
 const STORAGE_KEYS = {
   locale: "codingns-site-locale",
   theme: "codingns-site-theme"
 } as const;
+
+type HeroFlowExportConfig = {
+  enabled: boolean;
+  frameMs: number | null;
+  locale: Locale | null;
+  theme: ThemeMode | null;
+  initialHoldMs: number;
+  deviceRotateMs: number;
+  transitionMs: number;
+  workspaceScrollMs: number;
+  mobileScrollMs: number;
+  sessionFloatMs: number;
+};
+
+type HeroFlowFrameSpec = {
+  frameMs: number;
+  initialHoldMs: number;
+  deviceRotateMs: number;
+  transitionMs: number;
+};
+
+type ShowcaseSlotSpec = {
+  x: number;
+  y: number;
+  scale: number;
+  rotate: number;
+  zIndex: number;
+  opacity: number;
+  saturate: number;
+  blur: number;
+};
+
+const HERO_SHOWCASE_SLOT_SPECS: ShowcaseSlotSpec[] = [
+  { x: 44, y: -146, scale: 1.54, rotate: -2.8, zIndex: 6, opacity: 1, saturate: 1, blur: 0 },
+  { x: 344, y: 4, scale: 0.52, rotate: 9, zIndex: 4, opacity: 0.42, saturate: 0.66, blur: 0.3 },
+  { x: 230, y: 320, scale: 0.28, rotate: 6, zIndex: 2, opacity: 0.1, saturate: 0.46, blur: 0.8 },
+  { x: -264, y: 294, scale: 0.34, rotate: -7, zIndex: 3, opacity: 0.14, saturate: 0.48, blur: 0.72 },
+  { x: -392, y: -4, scale: 0.46, rotate: -10, zIndex: 3, opacity: 0.28, saturate: 0.58, blur: 0.46 }
+];
+
+function parsePositiveInteger(value: string | null) {
+  if (!value) {
+    return null;
+  }
+
+  const parsed = Number.parseInt(value, 10);
+
+  return Number.isFinite(parsed) && parsed > 0 ? parsed : null;
+}
+
+function resolveExportLocale(value: string | null): Locale | null {
+  return value === "zh-CN" || value === "en-US" ? value : null;
+}
+
+function resolveExportTheme(value: string | null): ThemeMode | null {
+  return value === "light" || value === "dark" ? value : null;
+}
+
+function resolveHeroFlowExportConfig(): HeroFlowExportConfig {
+  if (typeof window === "undefined") {
+    return {
+      enabled: false,
+      frameMs: null,
+      locale: null,
+      theme: null,
+      initialHoldMs: 0,
+      deviceRotateMs: HERO_ROTATE_INTERVAL_MS,
+      transitionMs: HERO_DEVICE_TRANSITION_MS,
+      workspaceScrollMs: HERO_WORKSPACE_SCROLL_MS,
+      mobileScrollMs: HERO_MOBILE_SCROLL_MS,
+      sessionFloatMs: HERO_SESSION_FLOAT_MS
+    };
+  }
+
+  const params = new URLSearchParams(window.location.search);
+  const enabled = params.get("export") === "hero-flow";
+
+  return {
+    enabled,
+    frameMs: enabled ? parsePositiveInteger(params.get("frameMs")) ?? 0 : null,
+    locale: enabled ? resolveExportLocale(params.get("locale")) : null,
+    theme: enabled ? resolveExportTheme(params.get("theme")) : null,
+    initialHoldMs: enabled ? parsePositiveInteger(params.get("holdMs")) ?? 3000 : 0,
+    deviceRotateMs: enabled ? parsePositiveInteger(params.get("rotateMs")) ?? 1200 : HERO_ROTATE_INTERVAL_MS,
+    transitionMs: enabled ? parsePositiveInteger(params.get("transitionMs")) ?? 720 : HERO_DEVICE_TRANSITION_MS,
+    workspaceScrollMs: enabled
+      ? parsePositiveInteger(params.get("workspaceScrollMs")) ?? 5600
+      : HERO_WORKSPACE_SCROLL_MS,
+    mobileScrollMs: enabled ? parsePositiveInteger(params.get("mobileScrollMs")) ?? 4800 : HERO_MOBILE_SCROLL_MS,
+    sessionFloatMs: enabled ? parsePositiveInteger(params.get("sessionFloatMs")) ?? 2800 : HERO_SESSION_FLOAT_MS
+  };
+}
+
+function easeOutCubic(value: number) {
+  return 1 - (1 - value) ** 3;
+}
+
+function interpolateNumber(from: number, to: number, progress: number) {
+  return from + (to - from) * progress;
+}
+
+function buildHeroFlowExportStyle(config: HeroFlowExportConfig): CSSProperties | undefined {
+  if (!config.enabled) {
+    return undefined;
+  }
+
+  const style = {
+    "--hero-flow-device-transition-ms": `${config.transitionMs}ms`,
+    "--hero-flow-workspace-scroll-ms": `${config.workspaceScrollMs}ms`,
+    "--hero-flow-mobile-scroll-ms": `${config.mobileScrollMs}ms`,
+    "--hero-flow-session-float-ms": `${config.sessionFloatMs}ms`,
+    "--hero-flow-workspace-delay": `-${config.frameMs! % config.workspaceScrollMs}ms`,
+    "--hero-flow-mobile-delay": `-${config.frameMs! % config.mobileScrollMs}ms`,
+    "--hero-flow-session-delay": `-${config.frameMs! % config.sessionFloatMs}ms`
+  } as CSSProperties;
+
+  return style;
+}
+
+function resolveHeroFlowFrameStyle(deviceIndex: number, frameSpec: HeroFlowFrameSpec): CSSProperties {
+  const elapsedMs = Math.max(frameSpec.frameMs - frameSpec.initialHoldMs, 0);
+  const completedRotations = Math.floor(elapsedMs / frameSpec.deviceRotateMs);
+  const cycleProgressMs = elapsedMs % frameSpec.deviceRotateMs;
+  const sourceFrontIndex = completedRotations % HERO_DEVICE_COUNT;
+  const targetFrontIndex = (sourceFrontIndex + 1) % HERO_DEVICE_COUNT;
+  const transitionProgress = frameSpec.frameMs < frameSpec.initialHoldMs
+    ? 0
+    :
+    frameSpec.transitionMs > 0 ? Math.min(cycleProgressMs / frameSpec.transitionMs, 1) : 1;
+  const easedProgress = easeOutCubic(transitionProgress);
+  const sourceSlotIndex = (deviceIndex - sourceFrontIndex + HERO_DEVICE_COUNT) % HERO_DEVICE_COUNT;
+  const targetSlotIndex = (deviceIndex - targetFrontIndex + HERO_DEVICE_COUNT) % HERO_DEVICE_COUNT;
+  const sourceSlot = HERO_SHOWCASE_SLOT_SPECS[sourceSlotIndex];
+  const targetSlot = HERO_SHOWCASE_SLOT_SPECS[targetSlotIndex];
+  const x = interpolateNumber(sourceSlot.x, targetSlot.x, easedProgress);
+  const y = interpolateNumber(sourceSlot.y, targetSlot.y, easedProgress);
+  const scale = interpolateNumber(sourceSlot.scale, targetSlot.scale, easedProgress);
+  const rotate = interpolateNumber(sourceSlot.rotate, targetSlot.rotate, easedProgress);
+  const zIndex = Math.round(interpolateNumber(sourceSlot.zIndex, targetSlot.zIndex, easedProgress));
+  const opacity = interpolateNumber(sourceSlot.opacity, targetSlot.opacity, easedProgress);
+  const saturate = interpolateNumber(sourceSlot.saturate, targetSlot.saturate, easedProgress);
+  const blur = interpolateNumber(sourceSlot.blur, targetSlot.blur, easedProgress);
+
+  return {
+    transform: `translate(-50%, -50%) translate3d(${x}px, ${y}px, 0) scale(${scale}) rotate(${rotate}deg)`,
+    zIndex,
+    opacity,
+    filter: `saturate(${saturate}) blur(${blur}px)`
+  };
+}
 
 type ProviderFlowItem = {
   id: string;
@@ -555,8 +709,9 @@ function useSectionActivity<T extends HTMLElement>(threshold = 0.35, pageVisible
 }
 
 export function App() {
-  const [locale, setLocale] = useState<Locale>(() => resolveDefaultLocale());
-  const [theme, setTheme] = useState<ThemeMode>(() => resolveDefaultTheme());
+  const heroFlowExportConfig = useMemo(() => resolveHeroFlowExportConfig(), []);
+  const [locale, setLocale] = useState<Locale>(() => heroFlowExportConfig.locale ?? resolveDefaultLocale());
+  const [theme, setTheme] = useState<ThemeMode>(() => heroFlowExportConfig.theme ?? resolveDefaultTheme());
   const [frontDeviceIndex, setFrontDeviceIndex] = useState(0);
   const [platformMediaIndex, setPlatformMediaIndex] = useState(0);
   const [installMethodId, setInstallMethodId] = useState<InstallMethodId>("curl");
@@ -568,6 +723,27 @@ export function App() {
   const [remoteAccessSectionRef, remoteAccessSectionActive] = useSectionActivity<HTMLElement>(0.26, pageVisible);
 
   const copy = useMemo(() => siteCopy[locale], [locale]);
+  const heroFlowFrameSpec = useMemo<HeroFlowFrameSpec | null>(
+    () =>
+      heroFlowExportConfig.enabled
+        ? {
+            frameMs: heroFlowExportConfig.frameMs ?? 0,
+            initialHoldMs: heroFlowExportConfig.initialHoldMs,
+            deviceRotateMs: heroFlowExportConfig.deviceRotateMs,
+            transitionMs: heroFlowExportConfig.transitionMs
+          }
+        : null,
+    [heroFlowExportConfig]
+  );
+  const heroFlowAnimationStyle = useMemo(
+    () => buildHeroFlowExportStyle(heroFlowExportConfig),
+    [heroFlowExportConfig]
+  );
+  const effectiveFrontDeviceIndex = heroFlowFrameSpec
+    ? Math.floor(Math.max(heroFlowFrameSpec.frameMs - heroFlowFrameSpec.initialHoldMs, 0) / heroFlowFrameSpec.deviceRotateMs) %
+      HERO_DEVICE_COUNT
+    : frontDeviceIndex;
+  const heroFlowIsActive = heroFlowExportConfig.enabled ? false : heroSectionActive;
   const siteOrigin = useMemo(() => {
     if (typeof window !== "undefined" && window.location.origin) {
       return window.location.origin.replace(/\/$/, "");
@@ -615,7 +791,7 @@ export function App() {
   }, [theme]);
 
   useEffect(() => {
-    if (!heroSectionActive) {
+    if (!heroSectionActive || heroFlowExportConfig.enabled) {
       return;
     }
 
@@ -626,7 +802,7 @@ export function App() {
     return () => {
       window.clearInterval(timer);
     };
-  }, [heroSectionActive]);
+  }, [heroFlowExportConfig.enabled, heroSectionActive]);
 
   useEffect(() => {
     setPlatformMediaIndex(0);
@@ -694,6 +870,25 @@ export function App() {
     } catch (error) {
       console.error("[codingns-site] copy install command failed", error);
     }
+  }
+
+  if (heroFlowExportConfig.enabled) {
+    return (
+      <div className="page-shell page-shell-export">
+        <main className="export-main">
+          <section className="hero-flow-export-scene" aria-label="Hero Flow GIF Export Scene">
+            <HeroFlowVisual
+              copy={copy.hero}
+              frontDeviceIndex={effectiveFrontDeviceIndex}
+              onSelectDevice={setFrontDeviceIndex}
+              isActive={heroFlowIsActive}
+              animationStyle={heroFlowAnimationStyle}
+              frameSpec={heroFlowFrameSpec}
+            />
+          </section>
+        </main>
+      </div>
+    );
   }
 
   return (
@@ -787,9 +982,11 @@ export function App() {
 
           <HeroFlowVisual
             copy={copy.hero}
-            frontDeviceIndex={frontDeviceIndex}
+            frontDeviceIndex={effectiveFrontDeviceIndex}
             onSelectDevice={setFrontDeviceIndex}
-            isActive={heroSectionActive}
+            isActive={heroFlowIsActive}
+            animationStyle={heroFlowAnimationStyle}
+            frameSpec={heroFlowFrameSpec}
           />
         </section>
 
@@ -1413,9 +1610,18 @@ type HeroFlowVisualProps = {
   frontDeviceIndex: number;
   onSelectDevice: (index: number) => void;
   isActive: boolean;
+  animationStyle?: CSSProperties;
+  frameSpec?: HeroFlowFrameSpec | null;
 };
 
-function HeroFlowVisual({ copy, frontDeviceIndex, onSelectDevice, isActive }: HeroFlowVisualProps) {
+function HeroFlowVisual({
+  copy,
+  frontDeviceIndex,
+  onSelectDevice,
+  isActive,
+  animationStyle,
+  frameSpec
+}: HeroFlowVisualProps) {
   const devices = [
     {
       key: "macbook",
@@ -1445,19 +1651,26 @@ function HeroFlowVisual({ copy, frontDeviceIndex, onSelectDevice, isActive }: He
   ];
 
   return (
-    <div className="hero-flow" aria-label="设备切换展示区" data-active={isActive ? "true" : "false"}>
+    <div
+      className="hero-flow"
+      aria-label="设备切换展示区"
+      data-active={isActive ? "true" : "false"}
+      style={animationStyle}
+    >
       <div className="device-showcase-glow device-showcase-glow-left" />
       <div className="device-showcase-glow device-showcase-glow-right" />
       <div className="device-showcase-stage">
         {devices.map((device, index) => (
           <DeviceShowcaseCard
             key={device.key}
+            deviceIndex={index}
             kind={device.kind}
             label={device.label}
             workspace={copy.workspace}
             mobile={copy.mobile}
             isFront={index === frontDeviceIndex}
             slotIndex={(index - frontDeviceIndex + devices.length) % devices.length}
+            frameSpec={frameSpec}
             onSelect={() => onSelectDevice(index)}
           />
         ))}
@@ -1726,25 +1939,30 @@ function DeviceGlyph({ type }: DeviceGlyphProps) {
 type DeviceKind = "macbook" | "iphone" | "android" | "ipad" | "chrome";
 
 type DeviceShowcaseCardProps = {
+  deviceIndex: number;
   kind: DeviceKind;
   label: SiteHero["devices"]["macbook"];
   workspace: SiteHero["workspace"];
   mobile: SiteHero["mobile"];
   isFront: boolean;
   slotIndex: number;
+  frameSpec?: HeroFlowFrameSpec | null;
   onSelect: () => void;
 };
 
 function DeviceShowcaseCard({
+  deviceIndex,
   kind,
   label,
   workspace,
   mobile,
   isFront,
   slotIndex,
+  frameSpec,
   onSelect,
 }: DeviceShowcaseCardProps) {
   const slotClass = `showcase-slot-${slotIndex}`;
+  const frameStyle = frameSpec ? resolveHeroFlowFrameStyle(deviceIndex, frameSpec) : undefined;
 
   return (
     <button
@@ -1753,6 +1971,7 @@ function DeviceShowcaseCard({
       onClick={onSelect}
       aria-label={`${label.name} ${label.caption}`}
       aria-pressed={isFront}
+      style={frameStyle}
     >
       {kind === "macbook" ? <MacbookShell workspace={workspace} /> : null}
       {kind === "iphone" ? <IPhoneShell mobile={mobile} /> : null}
