@@ -669,7 +669,7 @@ export const siteCopy: Record<Locale, SiteCopy> = {
     install: {
       sectionEyebrow: "安装",
       title: "一条命令装上去，开始接住你的 CLI 会话。",
-      description: "支持 macOS / Linux 一键脚本、Windows PowerShell 一键脚本和 npm 安装。Windows 脚本会使用私有 Node.js 22 运行时和受控原生依赖。",
+      description: "支持 macOS / Linux 一键脚本、Windows PowerShell 一键脚本和 npm 安装。Windows 脚本使用当前 Node.js 运行时和 npm 预编译原生依赖。",
       tabsLabel: "安装方式",
       methods: [
         {
@@ -685,12 +685,12 @@ export const siteCopy: Record<Locale, SiteCopy> = {
         {
           id: "npm",
           label: "npm",
-          summary: "适合你自己掌控安装过程，后续再按需要手工启动或接入 PM2。npm 安装和 PM2 托管都要求使用 Node.js 22。"
+          summary: "适合你自己掌控安装过程，后续再按需要手工启动或接入 PM2。本地 Node.js 22 或更高版本即可进行 npm 安装和 PM2 托管。"
         }
       ],
       copyAction: "复制命令",
       copiedAction: "已复制",
-      helper: "如果你更谨慎，也可以先把脚本下载下来检查，再执行。Windows 命令请在 PowerShell 中运行；脚本会自动补齐 Git for Windows，并使用私有 Node.js 22 安装 CodingNS。macOS 和 Linux 侧也会强制锁定到 Node.js 22。",
+      helper: "如果你更谨慎，也可以先把脚本下载下来检查，再执行。Windows 命令请在 PowerShell 中运行；脚本会自动补齐 Git for Windows，并使用当前 Node.js 安装 CodingNS。macOS 和 Linux 侧要求 Node.js 22 或更高版本。",
       nextStepLabel: "查看 npm 安装后的后续操作",
       nextStepHref: "https://docs.codingns.com/quick-install/host-installation",
       docsLabel: "查看官方安装文档",
@@ -1113,7 +1113,7 @@ export const siteCopy: Record<Locale, SiteCopy> = {
     install: {
       sectionEyebrow: "Install",
       title: "Install it with one command and start catching your CLI sessions.",
-      description: "Use the macOS / Linux shell script, the Windows PowerShell script, or plain npm install. The Windows flow uses a private Node.js 22 runtime and managed native packages.",
+      description: "Use the macOS / Linux shell script, the Windows PowerShell script, or plain npm install. The Windows flow uses the current Node.js runtime and npm prebuilt native packages.",
       tabsLabel: "Installation methods",
       methods: [
         {
@@ -1129,12 +1129,12 @@ export const siteCopy: Record<Locale, SiteCopy> = {
         {
           id: "npm",
           label: "npm",
-          summary: "Best if you want to control the installation steps yourself and wire PM2 manually afterwards. npm installs and PM2-managed runs require Node.js 22."
+          summary: "Best if you want to control the installation steps yourself and wire PM2 manually afterwards. npm installs and PM2-managed runs require Node.js 22 or later."
         }
       ],
       copyAction: "Copy command",
       copiedAction: "Copied",
-      helper: "If you prefer a safer flow, download the script first, inspect it, and then run it locally. Run the Windows command in PowerShell; the script can install Git for Windows automatically and then uses the private Node.js 22 runtime for CodingNS. On macOS and Linux, the installer also locks the runtime to Node.js 22.",
+      helper: "If you prefer a safer flow, download the script first, inspect it, and then run it locally. Run the Windows command in PowerShell; the script can install Git for Windows automatically and then uses the current Node.js runtime for CodingNS. On macOS and Linux, the installer requires Node.js 22 or later.",
       nextStepLabel: "See the next steps after npm install",
       nextStepHref: "https://docs.codingns.com/quick-install/host-installation",
       docsLabel: "Open the official install guide",
