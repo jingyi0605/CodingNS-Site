@@ -685,7 +685,7 @@ export const siteCopy: Record<Locale, SiteCopy> = {
         {
           id: "npm",
           label: "npm",
-          summary: "适合你自己掌控安装过程，后续再按需要手工启动或接入 PM2。本地 Node.js 22 或更高版本即可进行 npm 安装和 PM2 托管。"
+          summary: "适合你自己掌控安装过程，再用统一安装器配置服务和操作系统原生自启。本地 Node.js 22 或更高版本即可安装。"
         }
       ],
       copyAction: "复制命令",
@@ -1129,7 +1129,7 @@ export const siteCopy: Record<Locale, SiteCopy> = {
         {
           id: "npm",
           label: "npm",
-          summary: "Best if you want to control the installation steps yourself and wire PM2 manually afterwards. npm installs and PM2-managed runs require Node.js 22 or later."
+          summary: "Best if you want to control the installation steps yourself and then use the unified installer for the service and native startup. npm installation requires Node.js 22 or later."
         }
       ],
       copyAction: "Copy command",
